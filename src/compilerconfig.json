@@ -1,0 +1,41 @@
+﻿[
+  {
+    "outputFile": "lib/daVinci.js/src/directives/listview.css",
+    "inputFile": "lib/daVinci.js/src/directives/listview.less",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "lib/daVinci.js/src/directives/statusText.css",
+    "inputFile": "lib/daVinci.js/src/directives/statusText.less",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "lib/daVinci.js/src/directives/scrollBar.css",
+    "inputFile": "lib/daVinci.js/src/directives/scrollBar.less",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "q2g-ext-selector.css",
+    "inputFile": "q2g-ext-selector.less",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "lib/daVinci.js/src/directives/identifier.css",
+    "inputFile": "lib/daVinci.js/src/directives/identifier.less",
+    "minify": {
+      "enabled": false
+    }
+  },
+  {
+    "outputFile": "lib/daVinci.js/src/directives/extensionHeader.css",
+    "inputFile": "lib/daVinci.js/src/directives/extensionHeader.less"
+  }
+]

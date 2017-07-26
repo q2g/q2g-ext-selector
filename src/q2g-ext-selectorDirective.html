@@ -1,0 +1,96 @@
+
+    <div class="root-container"
+         tabindex="0"
+         q2g-shortcut-scope="'rootelement'">
+
+            <table q2g-shortcut
+                   shortcut="[{name:'clearselection', shortcut:vm.properties.shortcutClearSelection}]"
+                   shortcut-action="vm.shortcutHandler(objectShortcut)"
+                   class="rootTable">
+                <tr>
+                    <td q2g-shortcut-scope="'dimensionelement'"
+                        class="doublePage dimensionList"
+                        q2g-shortcut
+                        shortcut="[{name:'escDimension', shortcut:'27'}]"
+                        shortcut-action="vm.shortcutHandler(objectShortcut)">
+                        <div>
+                            <q2g-extension-header menu-list="vm.menuListDimension"
+                                           max-number-of-elements="4"
+                                           reserved-button-width="0.5"
+                                           text-search="vm.textSearchDimension"
+                                           shortcut-searchfield="'strg + alt + 83'"
+                                           show-buttons="vm.showButtonsDimension"
+                                           show-search-field="vm.showSearchFieldDimension"
+                                           title="vm.titleDimension"
+                                           callback-main-menu-button="vm.menuListActionCallback(item)">
+
+                            </q2g-extension-header>
+                        </div>
+                        <div style="position:relative"
+                             q2g-shortcut
+                             shortcut="[
+                            {name:'focusDimensionList', shortcut:vm.properties.shortcutFocusDimensionList, rootscope: '|global|'}]"
+                             shortcut-action="vm.shortcutHandler(objectShortcut)"
+                             keycode-override="[]">
+                            <q2g-listview style="height: calc(100% - 90px);"
+                                          tabindex="0"
+                                          items="vm.dimensionList.collection"
+                                          items-count="vm.dimensionList.itemsCounter"
+                                          items-page-top="vm.dimensionList.itemsPagingTop"
+                                          items-page-height="vm.dimensionList.itemsPagingHeight"
+                                          item-height="31"
+                                          item-focused="vm.focusedPositionDimension"
+                                          show-focused="vm.showFocusedDimension"
+                                          callback-listview-objects="vm.selectDimensionObjectCallback(pos)">
+                            </q2g-listview>
+                        </div>
+
+                    </td>
+                    <td q2g-shortcut-scope="'valueelement'" 
+                        class="doublePage valueList"
+                        q2g-shortcut
+                        shortcut="[{name:'escValues', shortcut:'27'}]"
+                        shortcut-action="vm.shortcutHandler(objectShortcut)">
+                        <q2g-extension-header menu-list="vm.menuListValues"
+                                       max-number-of-elements="4"
+                                       reserved-button-width="0.5"
+                                       text-search="vm.textSearchValue"
+                                       shortcut-searchfield="'strg + alt + 83'"
+                                       show-buttons="vm.showButtonsValue"
+                                       show-search-field="false"
+                                       title="vm.titleValues"
+                                       callback-main-menu-button="vm.menuListActionCallback(item)">
+
+                        </q2g-extension-header>
+                        <div style="position:relative"
+                             q2g-shortcut
+                             shortcut="[
+                             {name:'focusValueList', shortcut:vm.properties.shortcutFocusValueList, rootscope: '|global|'}]"
+                             shortcut-action="vm.shortcutHandler(objectShortcut)">
+                            <q2g-listview style="height: calc(100% - 90px);"
+                                          tabindex="0"
+                                          items="vm.valueList.collection"
+                                          items-count="vm.valueList.itemsCounter"
+                                          items-page-top="vm.valueList.itemsPagingTop"
+                                          items-page-height="vm.valueList.itemsPagingHeight"
+                                          item-height="31"
+                                          item-focused="vm.focusedPositionValues"
+                                          show-focused="vm.showFocusedValue"
+                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)">
+                            </q2g-listview>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <div style="position: absolute; bottom: 0px;"
+                 class="status"
+                 ng-if="vm.useReadebility"
+                 tabindex="0">
+                <q2g-status-text statustext="vm.statusText" statustime=vm.timeAriaIntervall></q2g-status-text>
+            </div>
+            <q2g-akquinet-identifier show="vm.isEditMode()"></q2g-akquinet-identifier>
+
+        <div ng-if="vm.isEditMode()"
+             class="editMode"></div>
+    </div>

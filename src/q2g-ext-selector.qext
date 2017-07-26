@@ -1,0 +1,16 @@
+{
+    "name": "q2g Selector",
+    "description": "",
+    "type": "visualization",
+    "icon": "filterpane",
+    "version": "1.0.1",
+    "author": "tiq & akquinet",
+    "preview": "preview.png",
+    "homepage": "",
+    "keywords": "qlik-sense, visualization",
+    "license": "Commercial",
+    "repository": "",
+    "dependencies": {
+        "qlik-sense": ">=3.2.x"
+    }
+} 
