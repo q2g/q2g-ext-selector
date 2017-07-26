@@ -209,6 +209,7 @@ export = {
     template: template,
     controller: ["$scope", function (
         scope: IVMScope<SelectionExtension>) {
+        logger.info("Initialice Extension");
         scope.vm = new SelectionExtension(getEnigma(scope));
     }]
 }
