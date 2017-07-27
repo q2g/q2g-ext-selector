@@ -11,7 +11,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <TypeScriptToolsVersion>2.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.4</TypeScriptToolsVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -33,15 +33,12 @@
     <TypeScriptCompile Include="lib\daVinci.js\src\directives\shortcut.ts" />
     <TypeScriptCompile Include="helper.d.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\filter\statusFilter.ts" />
+    <TypeScriptCompile Include="lib\daVinci.js\src\services\registration.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\services\translate.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\utils\interfaces.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\utils\logger.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\utils\object.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\utils\utils.ts" />
-    <TypeScriptCompile Include="node_modules\%40types\angular\index.d.ts" />
-    <TypeScriptCompile Include="node_modules\%40types\jquery\index.d.ts" />
-    <TypeScriptCompile Include="node_modules\%40types\qlik-engineapi\index.d.ts" />
-    <TypeScriptCompile Include="node_modules\%40types\qlik-visualizationextensions\index.d.ts" />
     <TypeScriptCompile Include="lib\daVinci.js\src\directives\identifier.ts" />
     <Content Include="lib\daVinci.js\src\directives\extensionHeader.css">
       <DependentUpon>extensionHeader.less</DependentUpon>
@@ -124,23 +121,9 @@
     </None>
     <Content Include="package.json" />
     <Content Include="tsconfig.json" />
-    <Content Include="node_modules\%40types\angular\package.json" />
-    <Content Include="node_modules\%40types\angular\README.md" />
-    <Content Include="node_modules\%40types\angular\types-metadata.json" />
-    <Content Include="node_modules\%40types\jquery\package.json" />
-    <Content Include="node_modules\%40types\jquery\README.md" />
-    <Content Include="node_modules\%40types\jquery\types-metadata.json" />
-    <Content Include="node_modules\%40types\qlik-visualizationextensions\types-metadata.json" />
-    <Content Include="node_modules\%40types\qlik-visualizationextensions\package.json" />
-    <Content Include="node_modules\%40types\qlik-visualizationextensions\README.md" />
     <Content Include="web.config" />
     <Content Include="packages.config" />
-    <Content Include="node_modules\%40types\qlik-engineapi\LICENSE" />
-    <Content Include="node_modules\%40types\qlik-engineapi\package.json" />
-    <Content Include="node_modules\%40types\qlik-engineapi\README.md" />
     <Content Include="lib\daVinci.js\src\package.json" />
-    <None Include="translate\de-DE\propertypanel.json" />
-    <None Include="translate\en-US\propertypanel.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

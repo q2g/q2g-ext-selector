@@ -67,6 +67,18 @@
                              shortcut="[
                              {name:'focusValueList', shortcut:vm.properties.shortcutFocusValueList, rootscope: '|global|'}]"
                              shortcut-action="vm.shortcutHandler(objectShortcut)">
+                            <!--<q2g-listview style="height: calc(100% - 90px);"
+                                          tabindex="0"
+                                          items="vm.valueList.collection"
+                                          items-count="vm.valueList.itemsCounter"
+                                          items-page-top="vm.valueList.itemsPagingTop"
+                                          items-page-height="vm.valueList.itemsPagingHeight"
+                                          item-height="31"
+                                          item-focused="vm.focusedPositionValues"
+                                          show-focused="vm.showFocusedValue"
+                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)"
+                                          override-shortcuts="[{name:'up', shortcut: '79'}, {name:'down', shortcut: '80'}]">
+                            </q2g-listview>-->
                             <q2g-listview style="height: calc(100% - 90px);"
                                           tabindex="0"
                                           items="vm.valueList.collection"

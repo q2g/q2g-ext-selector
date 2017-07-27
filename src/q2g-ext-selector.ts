@@ -1,4 +1,4 @@
-﻿/// <reference path="lib/daVinci.js/src/utils/utils.ts" />
+﻿/// <reference path="lib/daVinci.js/src/utils/utils.ts" /> 
 
 //#region Imports 
 import "css!./q2g-ext-selector.css";
@@ -11,19 +11,9 @@ import { Logging } from "./lib/daVinci.js/src/utils/logger";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";
 import { getEnigma, checkDirectiveIsRegistrated } from "./lib/daVinci.js/src/utils/utils";
 import { TranslateProvider, ITranslateProvider, TranslateService, ITranslateService } from "./lib/daVinci.js/src/services/translate";
+import { RegistrationProvider, IRegistrationProvider } from "./lib/daVinci.js/src/services/registration";
 //#endregion
 
-class AngularAssistProvider {
-    directive;
-    filter;
-    service;
-
-    constructor() {// object und schaut ob er diese hat (directive filter)
-        this.directive = qvangular.directive;
-        this.filter = qvangular.filter;
-        this.service = qvangular.service;
-    }
-}
 
 qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
     .translations("en", langEN)
@@ -32,8 +22,8 @@ qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
 
 let $translate = qvangular.service<ITranslateService>("$translate", TranslateService);
 
-
-qvangular.service("$registrationProvider", AngularAssistProvider);
+qvangular.service<IRegistrationProvider>("$registrationProvider", RegistrationProvider)
+    .implementObject(qvangular);
 
 //#region Logger
 Logging.LogConfig.SetLogLevel("*", Logging.LogLevel.info);
@@ -47,11 +37,6 @@ checkDirectiveIsRegistrated($injector, qvangular, "", SelectionsDirectiveFactory
 //#endregion
 
 //#region assist classes
-let shortcutFocusDimensionList: string = "strg + alt + 70";
-let shortcutFocusSearchField: string = "strg + alt + 83";
-let shortcutFocusValueList: string = "strg + alt + 87";
-let shortcutClearSelection: string = "strg + alt + 76";
-
 let parameter = {
     type: "items",
     component: "accordion",
@@ -64,7 +49,7 @@ let parameter = {
             items: {
                 accessibility: {
                     type: "items",
-                    label: "accessibility",
+                    label: $translate.instant("properties.accessibility"),
                     grouped: true,
                     items: {
                         shortcuts: {
@@ -94,10 +79,10 @@ let parameter = {
                                     ref: "properties.shortcutFocusDimensionList",
                                     label: "focus dimension list",
                                     type: "string",
-                                    defaultValue: shortcutFocusDimensionList,
+                                    defaultValue: "strg + alt + 70",
                                     show: function (data: any) {
                                         if (data.properties.shortcutUseDefaults) {
-                                            data.properties.shortcutFocusDimensionList = shortcutFocusDimensionList;
+                                            data.properties.shortcutFocusDimensionList = "strg + alt + 70";
                                         }
                                         return !data.properties.shortcutUseDefaults;
                                     }
@@ -106,10 +91,10 @@ let parameter = {
                                     ref: "properties.shortcutFocusSearchField",
                                     label: "focus search field",
                                     type: "string",
-                                    defaultValue: shortcutFocusSearchField,
+                                    defaultValue: "strg + alt + 83",
                                     show: function (data: any) {
                                         if (data.properties.shortcutUseDefaults) {
-                                            data.properties.shortcutFocusSearchField = shortcutFocusSearchField;
+                                            data.properties.shortcutFocusSearchField = "strg + alt + 83";
                                         }
                                         return !data.properties.shortcutUseDefaults;
                                     }
@@ -118,10 +103,10 @@ let parameter = {
                                     ref: "properties.shortcutFocusValueList",
                                     label: "focus value list",
                                     type: "string",
-                                    defaultValue: shortcutFocusValueList,
+                                    defaultValue: "strg + alt + 87",
                                     show: function (data: any) {
                                         if (data.properties.shortcutUseDefaults) {
-                                            data.properties.shortcutFocusValueList = shortcutFocusValueList;
+                                            data.properties.shortcutFocusValueList = "strg + alt + 87";
                                         }
                                         return !data.properties.shortcutUseDefaults;
                                     }
@@ -130,10 +115,10 @@ let parameter = {
                                     ref: "properties.shortcutClearSelection",
                                     label: "delete selction",
                                     type: "string",
-                                    defaultValue: shortcutClearSelection,
+                                    defaultValue: "strg + alt + 76",
                                     show: function (data: any) {
                                         if (data.properties.shortcutUseDefaults) {
-                                            data.properties.shortcutClearSelection = shortcutClearSelection;
+                                            data.properties.shortcutClearSelection = "strg + alt + 76";
                                         }
                                         return !data.properties.shortcutUseDefaults;
                                     }
