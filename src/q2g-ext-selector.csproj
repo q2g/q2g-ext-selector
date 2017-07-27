@@ -139,8 +139,6 @@
     <Content Include="node_modules\%40types\qlik-engineapi\package.json" />
     <Content Include="node_modules\%40types\qlik-engineapi\README.md" />
     <Content Include="lib\daVinci.js\src\package.json" />
-    <None Include="translate\de-DE\propertypanel.json" />
-    <None Include="translate\en-US\propertypanel.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
