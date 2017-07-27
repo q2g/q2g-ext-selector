@@ -11,19 +11,9 @@ import { Logging } from "./lib/daVinci.js/src/utils/logger";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";
 import { getEnigma, checkDirectiveIsRegistrated } from "./lib/daVinci.js/src/utils/utils";
 import { TranslateProvider, ITranslateProvider, TranslateService, ITranslateService } from "./lib/daVinci.js/src/services/translate";
+import { RegistrationProvider, IRegistrationProvider } from "./lib/daVinci.js/src/services/registration";
 //#endregion
 
-class AngularAssistProvider {
-    directive;
-    filter;
-    service;
-
-    constructor() {// object und schaut ob er diese hat (directive filter)
-        this.directive = qvangular.directive;
-        this.filter = qvangular.filter;
-        this.service = qvangular.service;
-    }
-}
 
 qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
     .translations("en", langEN)
@@ -32,8 +22,8 @@ qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
 
 let $translate = qvangular.service<ITranslateService>("$translate", TranslateService);
 
-
-qvangular.service("$registrationProvider", AngularAssistProvider);
+qvangular.service<IRegistrationProvider>("$registrationProvider", RegistrationProvider)
+    .implementObject(qvangular);
 
 //#region Logger
 Logging.LogConfig.SetLogLevel("*", Logging.LogLevel.info);
@@ -59,7 +49,7 @@ let parameter = {
             items: {
                 accessibility: {
                     type: "items",
-                    label: "accessibility",
+                    label: $translate.instant("properties.accessibility"),
                     grouped: true,
                     items: {
                         shortcuts: {
