@@ -1,0 +1,46 @@
+﻿.q2g-selection {
+  height: 100%;
+  width: 100%;
+
+  .rootTable {
+      height:100%
+  }
+
+  td {
+      vertical-align:top;
+  }
+  
+  .doublePage {
+      width: 50%;
+  }
+  .editMode {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+      top: 0;
+  }
+}
+.q2g-selection .list-span {
+  margin-left: 5px;
+}
+.q2g-selection .status {
+  margin-left: 5px;
+  font-style: italic;
+}
+.q2g-selection .root-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+.q2g-selection h2 {
+    height: 25px;
+    font-size: 18px;
+    text-align: center;
+}
+/* missing icon definition in deployed leonardo-ui.css for version < v3.2 */
+.lui-icon--save:before {
+  content: "\CD";
+  border-right: 1px solid black
+}
