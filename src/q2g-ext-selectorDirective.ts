@@ -178,7 +178,7 @@ class SelectionsController implements ng.IController {
     set focusedPositionValues(newVal: number) {
         if (newVal !== this._focusedPositionValues && this.valueList) {
             if (this._focusedPositionValues !== -1) {
-                if (newVal >= this.valueList.itemsPagingTop && newVal <= this.valueList.itemsPagingTop + this.valueList.itemsPagingHeight-1) {
+                if (newVal >= this.valueList.itemsPagingTop && newVal <= this.valueList.itemsPagingTop + this.valueList.itemsPagingHeight - 1) {
                     this._focusedPositionValues = newVal;
                 } else {
                     this.valueList.itemsPagingTopSetPromise(this.calcPagingStart(newVal, this.focusedPositionValues, this.valueList))
@@ -438,31 +438,32 @@ class SelectionsController implements ng.IController {
      */
     selectDimensionObjectCallback(pos: number): void {
         logger.debug("function selectDimensionObjectCallback", "");
-
         try {
-            setTimeout(() => {
-                this.showFocusedDimension = true;
-                this.dimensionList.collection.forEach((x) => {
-                    x.status = "A";
-                });
+            if (this.selectedDimension !== this.dimensionList.collection[pos].id) {
+                setTimeout(() => {
+                    this.showFocusedDimension = true;
+                    this.dimensionList.collection.forEach((x) => {
+                        x.status = "A";
+                    });
 
-                // dimension
-                this.selectedDimension = this.dimensionList.collection[pos].id;
-                this.selectedDimensionDefs = this.dimensionList.collection[pos].defs;
-                this.focusedPositionDimension = pos + this.dimensionList.itemsPagingTop;
-                this.dimensionList.collection[pos].status = "S";
+                    // dimension
+                    this.selectedDimension = this.dimensionList.collection[pos].id;
+                    this.selectedDimensionDefs = this.dimensionList.collection[pos].defs;
+                    this.focusedPositionDimension = pos + this.dimensionList.itemsPagingTop;
+                    this.dimensionList.collection[pos].status = "S";
 
-                // values
-                this.valueList = null;
-                this.focusedPositionValues = 0;
+                    // values
+                    this.valueList = null;
+                    this._focusedPositionValues = 0;
+                    this.createValueListSessionObjcet(this.selectedDimension, this.selectedDimensionDefs);
+                    this.textSearchValue = "";
+                    this.titleValues = this.dimensionList.collection[pos].title;
+                    // others
+                    this.statusText = "Dimension " + this.dimensionList.collection[pos].title + " gewählt";
 
-                this.createValueListSessionObjcet(this.selectedDimension, this.selectedDimensionDefs);
-                this.textSearchValue = "";
-                this.titleValues = this.dimensionList.collection[pos].title;
-                // others
-                this.statusText = "Dimension " + this.dimensionList.collection[pos].title + " gewählt";
+                }, this.actionDelay);
 
-            }, this.actionDelay);
+            }
         } catch (err) {
             logger.error("ERROR in selectDimension", err);
         }
