@@ -1,4 +1,5 @@
-﻿//#region Imports
+﻿
+//#region Imports
 import { Logging } from "./lib/daVinci.js/src/utils/logger";
 import { ListViewDirectiveFactory, IDataModelItem } from "./lib/daVinci.js/src/directives/listview";
 import { ScrollBarDirectiveFactory } from "./lib/daVinci.js/src/directives/scrollBar";
@@ -178,7 +179,9 @@ class SelectionsController implements ng.IController {
     set focusedPositionValues(newVal: number) {
         if (newVal !== this._focusedPositionValues && this.valueList) {
             if (this._focusedPositionValues !== -1) {
-                if (newVal >= this.valueList.itemsPagingTop && newVal <= this.valueList.itemsPagingTop + this.valueList.itemsPagingHeight - 1) {
+                if (newVal >= this.valueList.itemsPagingTop &&
+                    newVal <= this.valueList.itemsPagingTop + this.valueList.itemsPagingHeight - 1) {
+
                     this._focusedPositionValues = newVal;
                 } else {
                     this.valueList.itemsPagingTopSetPromise(this.calcPagingStart(newVal, this.focusedPositionValues, this.valueList))
@@ -203,11 +206,9 @@ class SelectionsController implements ng.IController {
     }
     set textSearchDimension(value: string) {
         if (value !== this.textSearchDimension) {
-            logger.info("value", value);
             try {
                 this._textSearchDimension = value;
                 if (!value) {
-
                     this.dimensionList.obj.searchFor("").then(() => {
                         this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
                         this.dimensionList.itemsCounter = (this.dimensionList.obj as any).model.calcCube.length;
@@ -215,6 +216,7 @@ class SelectionsController implements ng.IController {
                     });
                     return;
                 }
+
                 this.dimensionList.itemsPagingTop = 0;
                 this.dimensionList.obj.searchFor(value).then(() => {
                     this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
@@ -252,6 +254,8 @@ class SelectionsController implements ng.IController {
 
                 this.valueList.itemsPagingTop = 0;
                 this.valueList.obj.searchFor(value).then(() => {
+
+
                     return this.engineGenericObjectVal.getLayout();
                 }).then((res: EngineAPI.IGenericObjectProperties) => {
                     this.valueList.itemsCounter = res.qListObject.qDimensionInfo.qCardinal;
@@ -641,7 +645,9 @@ class SelectionsController implements ng.IController {
                         this.dimensionList.itemsPagingTop = this.focusedPositionDimension;
                     } else if (this.focusedPositionDimension >
                         this.dimensionList.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
-                        this.dimensionList.itemsPagingTop = this.focusedPositionDimension - (utils.calcNumbreOfVisRows(this.elementHeight) + 1);
+                        this.dimensionList.itemsPagingTop
+                            = this.focusedPositionDimension - (utils.calcNumbreOfVisRows(this.elementHeight) + 1);
+
                     }
 
                     objectShortcut.element.children().children().children().children()[
