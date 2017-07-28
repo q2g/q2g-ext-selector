@@ -203,6 +203,7 @@ class SelectionsController implements ng.IController {
     }
     set textSearchDimension(value: string) {
         if (value !== this.textSearchDimension) {
+            logger.info("value", value);
             try {
                 this._textSearchDimension = value;
                 if (!value) {
@@ -236,6 +237,7 @@ class SelectionsController implements ng.IController {
     set textSearchValue(value: string) {
         if (value !== this.textSearchValue) {
             try {
+                this.valueList.itemsPagingTop = 0;
                 this._textSearchValue = value;
                 if (!value) {
                     this.valueList.obj.searchFor("").then(() => {
@@ -683,6 +685,7 @@ class SelectionsController implements ng.IController {
                 this.timeout();
                 if (this.valueList.collection) {
                     if (this.focusedPositionValues < 0 ||
+                        this.focusedPositionValues >= this.valueList.collection.length ||
                         this.focusedPositionValues >= utils.calcNumbreOfVisRows(this.elementHeight) + this.valueList.itemsPagingTop) {
                         this.focusedPositionValues = 0;
                         this.valueList.itemsPagingTop = 0;
