@@ -448,9 +448,10 @@ class SelectionsController implements ng.IController {
             if (this.selectedDimension !== this.dimensionList.collection[pos].id) {
                 setTimeout(() => {
                     this.showFocusedDimension = true;
-                    this.dimensionList.collection.forEach((x) => {
+                    
+                    for (let x of this.dimensionList.collection) {
                         x.status = "A";
-                    });
+                    }
 
                     // dimension
                     this.selectedDimension = this.dimensionList.collection[pos].id;
