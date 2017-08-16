@@ -6,7 +6,7 @@ import { ScrollBarDirectiveFactory } from "./lib/daVinci.js/src/directives/scrol
 import { StatusTextDirectiveFactory } from "./lib/daVinci.js/src/directives/statusText";
 import { ExtensionHeaderDirectiveFactory } from "./lib/daVinci.js/src/directives/extensionHeader";
 import { ShortCutDirectiveFactory } from "./lib/daVinci.js/src/directives/shortcut";
-import { AkquinetIdentifierDirectiveFactory } from "./lib/daVinci.js/src/directives/identifier";
+import { IdentifierDirectiveFactory } from "./lib/daVinci.js/src/directives/identifier";
 import { q2gListAdapter, q2gListObject, q2gDimensionObject } from "./lib/daVinci.js/src/utils/object";
 
 import * as utils from "./lib/daVinci.js/src/utils/utils";
@@ -17,7 +17,7 @@ import * as qlik from "qlik";
 
 //#region Logger
 let logger = new Logging.Logger("q2g-ext-selectorDrective");
-//#endregion 
+//#endregion
 
 //#region interfaces
 interface IVMScope<T> extends ExtensionAPI.IExtensionScope {
@@ -439,7 +439,7 @@ class SelectionsController implements ng.IController {
     }
 
     /**
-     * creates a new session object for the selected dimension          
+     * creates a new session object for the selected dimension
      * @param pos position of the selected extension in the displayed list
      */
     selectDimensionObjectCallback(pos: number): void {
@@ -448,7 +448,7 @@ class SelectionsController implements ng.IController {
             if (this.selectedDimension !== this.dimensionList.collection[pos].id) {
                 setTimeout(() => {
                     this.showFocusedDimension = true;
-                    
+
                     for (let x of this.dimensionList.collection) {
                         x.status = "A";
                     }
@@ -818,7 +818,7 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
                     "StatusText");
                 utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
                     "Shortcut");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, AkquinetIdentifierDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, IdentifierDirectiveFactory(rootNameSpace),
                     "AkquinetIdentifier");
                 utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ExtensionHeaderDirectiveFactory(rootNameSpace),
                     "ExtensionHeader");
