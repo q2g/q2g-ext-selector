@@ -1,6 +1,6 @@
-﻿/// <reference path="lib/daVinci.js/src/utils/utils.ts" /> 
+﻿/// <reference path="lib/daVinci.js/src/utils/utils.ts" />
 
-//#region Imports 
+//#region Imports
 import "css!./q2g-ext-selector.css";
 import * as qvangular from "qvangular";
 import * as template from "text!./q2g-ext-selector.html";
@@ -194,7 +194,7 @@ export = {
     template: template,
     controller: ["$scope", function (
         scope: IVMScope<SelectionExtension>) {
-        logger.info("Initialice Extension");
+        logger.debug("Initialice Extension");
         scope.vm = new SelectionExtension(getEnigma(scope));
     }]
 }
