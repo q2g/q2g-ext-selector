@@ -11,7 +11,7 @@ import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci
 
 import * as utils from "./lib/daVinci.js/src/utils/utils";
 import * as template from "text!./q2g-ext-selectorDirective.html";
-//import * as qlik from "qlik";
+// import * as qlik from "qlik";
 //#endregion
 
 //#region Logger
@@ -768,13 +768,13 @@ class SelectionsController implements ng.IController {
     /**
      * checks if the extension is used in Edit mode
      */
-    //public isEditMode(): boolean {
+    // public isEditMode(): boolean {
     //    if (qlik.navigation.getMode() === "analysis") {
     //        return false;
     //    } else {
     //        return true;
     //    }
-    //}
+    // }
 
     /**
      * saves the Properties from the getLayout call from qlik enine in own Object
@@ -814,14 +814,14 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
                     "Listview");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ScrollBarDirectiveFactory(rootNameSpace),
                     "ScrollBar");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, StatusTextDirectiveFactory(rootNameSpace),
-                    "StatusText");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    StatusTextDirectiveFactory(rootNameSpace),"StatusText");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
                     "Shortcut");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, IdentifierDirectiveFactory(rootNameSpace),
-                    "AkquinetIdentifier");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ExtensionHeaderDirectiveFactory(rootNameSpace),
-                    "ExtensionHeader");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    IdentifierDirectiveFactory(rootNameSpace), "AkquinetIdentifier");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    ExtensionHeaderDirectiveFactory(rootNameSpace), "ExtensionHeader");
             }
         };
     };
