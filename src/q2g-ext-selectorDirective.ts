@@ -7,12 +7,11 @@ import { StatusTextDirectiveFactory } from "./lib/daVinci.js/src/directives/stat
 import { ExtensionHeaderDirectiveFactory } from "./lib/daVinci.js/src/directives/extensionHeader";
 import { ShortCutDirectiveFactory } from "./lib/daVinci.js/src/directives/shortcut";
 import { IdentifierDirectiveFactory } from "./lib/daVinci.js/src/directives/identifier";
-import { q2gListAdapter, q2gListObject, q2gDimensionObject } from "./lib/daVinci.js/src/utils/object";
+import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci.js/src/utils/object";
 
 import * as utils from "./lib/daVinci.js/src/utils/utils";
-import * as qvangular from "qvangular";
 import * as template from "text!./q2g-ext-selectorDirective.html";
-import * as qlik from "qlik";
+//import * as qlik from "qlik";
 //#endregion
 
 //#region Logger
@@ -54,8 +53,8 @@ class SelectionsController implements ng.IController {
     //#region Variables
     element: JQuery;
     timeout: ng.ITimeoutService;
-    dimensionList: q2gListAdapter;
-    valueList: q2gListAdapter;
+    dimensionList: Q2gListAdapter;
+    valueList: Q2gListAdapter;
     statusText: string;
     timeAriaIntervall: number = 0;
     actionDelay: number = 0;
@@ -88,6 +87,7 @@ class SelectionsController implements ng.IController {
     set engineroot(value: EngineAPI.IGenericObject) {
         if (value !== this._engineroot) {
             try {
+                logger.info("val", value);
                 this._engineroot = value;
                 let that = this;
                 this.engineroot.on("changed", function () {
@@ -95,16 +95,16 @@ class SelectionsController implements ng.IController {
 
                         that.getProperties(res.properties);
 
-                        if (!that.dimensionList.obj) {
-                            that.dimensionList = new q2gListAdapter(
-                                new q2gDimensionObject(
+                        if (!that.dimensionList) {
+                            that.dimensionList = new Q2gListAdapter(
+                                new Q2gDimensionObject(
                                     new utils.AssistHypercube(res)),
                                 utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length
                             );
                         } else {
                             that.dimensionList.updateList(
-                                new q2gDimensionObject(
+                                new Q2gDimensionObject(
                                     new utils.AssistHypercube(res)),
                                 utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length);
@@ -445,7 +445,7 @@ class SelectionsController implements ng.IController {
     selectDimensionObjectCallback(pos: number): void {
         logger.debug("function selectDimensionObjectCallback", "");
         try {
-            if (this.selectedDimension !== this.dimensionList.collection[pos].id) {
+            if (this.selectedDimension !== this.dimensionList.collection[pos].title) {
                 setTimeout(() => {
                     this.showFocusedDimension = true;
 
@@ -454,7 +454,7 @@ class SelectionsController implements ng.IController {
                     }
 
                     // dimension
-                    this.selectedDimension = this.dimensionList.collection[pos].id;
+                    this.selectedDimension = this.dimensionList.collection[pos].title;
                     this.selectedDimensionDefs = this.dimensionList.collection[pos].defs;
                     this.focusedPositionDimension = pos + this.dimensionList.itemsPagingTop;
                     this.dimensionList.collection[pos].status = "S";
@@ -564,8 +564,8 @@ class SelectionsController implements ng.IController {
 
                 genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
-                    this.valueList = new q2gListAdapter(
-                        new q2gListObject(
+                    this.valueList = new Q2gListAdapter(
+                        new Q2gListObject(
                             genericObject),
                         utils.calcNumbreOfVisRows(this.elementHeight),
                         res.qListObject.qDimensionInfo.qCardinal
@@ -589,7 +589,7 @@ class SelectionsController implements ng.IController {
      * @param focusedPosition the old value of the focusedPosition
      * @param object the list object, in which the changes shoud be done
      */
-    private calcPagingStart(newVal: number, focusedPosition: number, object: q2gListAdapter): number {
+    private calcPagingStart(newVal: number, focusedPosition: number, object: Q2gListAdapter): number {
 
         // absolutPosition out of sight below
         if (focusedPosition < object.itemsPagingTop && focusedPosition >= 0) {
@@ -768,13 +768,13 @@ class SelectionsController implements ng.IController {
     /**
      * checks if the extension is used in Edit mode
      */
-    public isEditMode(): boolean {
-        if (qlik.navigation.getMode() === "analysis") {
-            return false;
-        } else {
-            return true;
-        }
-    }
+    //public isEditMode(): boolean {
+    //    if (qlik.navigation.getMode() === "analysis") {
+    //        return false;
+    //    } else {
+    //        return true;
+    //    }
+    //}
 
     /**
      * saves the Properties from the getLayout call from qlik enine in own Object
@@ -798,7 +798,7 @@ class SelectionsController implements ng.IController {
 
 export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirectiveFactory {
     "use strict";
-    return ($document: ng.IAugmentedJQuery, $injector: ng.auto.IInjectorService) => {
+    return ($document: ng.IAugmentedJQuery, $injector: ng.auto.IInjectorService, $registrationProvider: any) => {
         return {
             restrict: "E",
             replace: true,
@@ -810,17 +810,17 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
                 engineroot: "<"
             },
             compile: ():void => {
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ListViewDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ListViewDirectiveFactory(rootNameSpace),
                     "Listview");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ScrollBarDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ScrollBarDirectiveFactory(rootNameSpace),
                     "ScrollBar");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, StatusTextDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, StatusTextDirectiveFactory(rootNameSpace),
                     "StatusText");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
                     "Shortcut");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, IdentifierDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, IdentifierDirectiveFactory(rootNameSpace),
                     "AkquinetIdentifier");
-                utils.checkDirectiveIsRegistrated($injector, qvangular, rootNameSpace, ExtensionHeaderDirectiveFactory(rootNameSpace),
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ExtensionHeaderDirectiveFactory(rootNameSpace),
                     "ExtensionHeader");
             }
         };
