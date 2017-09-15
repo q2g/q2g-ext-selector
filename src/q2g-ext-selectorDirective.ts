@@ -11,7 +11,6 @@ import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci
 
 import * as utils from "./lib/daVinci.js/src/utils/utils";
 import * as template from "text!./q2g-ext-selectorDirective.html";
-//import * as qlik from "qlik";
 //#endregion
 
 //#region Logger
@@ -73,6 +72,8 @@ class SelectionsController implements ng.IController {
     menuListValues: Array<any>;
     showSearchFieldDimension: boolean = false;
     showSearchFieldValues: boolean = false;
+    inverseDesign: boolean = false;
+    editMode: boolean = false;
 
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
@@ -95,7 +96,7 @@ class SelectionsController implements ng.IController {
 
                         that.getProperties(res.properties);
 
-                        if (!that.dimensionList) {
+                        if (!that.dimensionList.obj) {
                             that.dimensionList = new Q2gListAdapter(
                                 new Q2gDimensionObject(
                                     new utils.AssistHypercube(res)),
@@ -768,13 +769,13 @@ class SelectionsController implements ng.IController {
     /**
      * checks if the extension is used in Edit mode
      */
-    //public isEditMode(): boolean {
-    //    if (qlik.navigation.getMode() === "analysis") {
-    //        return false;
-    //    } else {
-    //        return true;
-    //    }
-    //}
+    public isEditMode(): boolean {
+        if (this.editMode) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * saves the Properties from the getLayout call from qlik enine in own Object
@@ -807,7 +808,9 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
             controllerAs: "vm",
             scope: {},
             bindToController: {
-                engineroot: "<"
+                engineroot: "<",
+                inverseDesign: "<?",
+                editMode: "<?"
             },
             compile: ():void => {
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ListViewDirectiveFactory(rootNameSpace),
