@@ -72,7 +72,7 @@ class SelectionsController implements ng.IController {
     menuListValues: Array<any>;
     showSearchFieldDimension: boolean = false;
     showSearchFieldValues: boolean = false;
-    inverseDesign: boolean = false;
+    inverseDesign: boolean;
     editMode: boolean = false;
 
     private selectedDimensionDefs: Array<string> = [];
@@ -366,7 +366,7 @@ class SelectionsController implements ng.IController {
         this.menuListValues.push({
             type: "",
             isVisible: true,
-            isEnabled: true,
+            isEnabled: false,
             icon: "clear-selections",
             name: "clear",
             hasSeparator: false
@@ -769,7 +769,7 @@ class SelectionsController implements ng.IController {
     /**
      * checks if the extension is used in Edit mode
      */
-    public isEditMode(): boolean {
+    isEditMode(): boolean {
         if (this.editMode) {
             return true;
         } else {
