@@ -1,8 +1,8 @@
 
     <div class="root-container"
+         ng-class="{'root-container-inferse':vm.inverseDesign}"
          tabindex="0"
          q2g-shortcut-scope="'rootelement'">
-
             <table q2g-shortcut
                    shortcut="[{name:'clearselection', shortcut:vm.properties.shortcutClearSelection}]"
                    shortcut-action="vm.shortcutHandler(objectShortcut)"
@@ -41,7 +41,8 @@
                                           item-height="31"
                                           item-focused="vm.focusedPositionDimension"
                                           show-focused="vm.showFocusedDimension"
-                                          callback-listview-objects="vm.selectDimensionObjectCallback(pos)">
+                                          callback-listview-objects="vm.selectDimensionObjectCallback(pos)"
+                                          inverse-design="vm.inverseDesign">
                             </q2g-listview>
                         </div>
 
@@ -89,7 +90,8 @@
                                           item-height="31"
                                           item-focused="vm.focusedPositionValues"
                                           show-focused="vm.showFocusedValue"
-                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)">
+                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)"
+                                          inverse-design="vm.inverseDesign">
                             </q2g-listview>
                         </div>
                     </td>
