@@ -179,13 +179,13 @@ let parameter = {
 
 
 class SelectionExtension {
-    constructor(enigmaRoot: EngineAPI.IGenericObject) {
+    constructor(model: EngineAPI.IGenericObject) {
         logger.debug("Constructor of Selection Extension", "");
 
-        this.engineRoot = enigmaRoot;
+        this.model = model;
     }
 
-    engineRoot: EngineAPI.IGenericObject;
+    model: EngineAPI.IGenericObject;
 
     public isEditMode() {
         if (qlik.navigation.getMode() === "analysis") {

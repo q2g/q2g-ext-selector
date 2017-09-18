@@ -72,7 +72,6 @@ class SelectionsController implements ng.IController {
     menuListValues: Array<any>;
     showSearchFieldDimension: boolean = false;
     showSearchFieldValues: boolean = false;
-    inverseDesign: boolean;
     editMode: boolean = false;
 
     private selectedDimensionDefs: Array<string> = [];
@@ -80,18 +79,34 @@ class SelectionsController implements ng.IController {
     private engineGenericObjectVal: EngineAPI.IGenericObject;
     //#endregion
 
-    //#region egineRoot
-    private _engineroot: EngineAPI.IGenericObject;
-    get engineroot(): EngineAPI.IGenericObject {
-        return this._engineroot;
+    //#region theme
+    private _theme: string;
+    get theme(): string {
+        if (this._theme) {
+            return this._theme;
+        }
+        return "default";
     }
-    set engineroot(value: EngineAPI.IGenericObject) {
-        if (value !== this._engineroot) {
+    set theme(value: string) {
+        if (value !== this._theme) {
+            logger.info("THEME", value);
+            this._theme = value;
+        }
+    }
+    //#endregion
+
+    //#region egineRoot
+    private _model: EngineAPI.IGenericObject;
+    get model(): EngineAPI.IGenericObject {
+        return this._model;
+    }
+    set model(value: EngineAPI.IGenericObject) {
+        if (value !== this._model) {
             try {
                 logger.info("val", value);
-                this._engineroot = value;
+                this._model = value;
                 let that = this;
-                this.engineroot.on("changed", function () {
+                this.model.on("changed", function () {
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
                         that.getProperties(res.properties);
@@ -114,7 +129,7 @@ class SelectionsController implements ng.IController {
                         }
                     });
                 });
-                this.engineroot.emit("changed");
+                this.model.emit("changed");
             } catch (e) {
                 logger.error("error", e);
             }
@@ -505,7 +520,7 @@ class SelectionsController implements ng.IController {
      */
     private createValueListSessionObjcet(dimensionName: string, dimensionFieldDefs: Array<string>): void {
         if (this.engineGenericObjectVal) {
-            this.engineroot.app.destroySessionObject(this.engineGenericObjectVal.id)
+            this.model.app.destroySessionObject(this.engineGenericObjectVal.id)
                 .then(() => {
                     this.createValueListSessionObjectAssist(dimensionName, dimensionFieldDefs);
                 })
@@ -559,7 +574,7 @@ class SelectionsController implements ng.IController {
         };
 
 
-        this.engineroot.app.createSessionObject(parameter)
+        this.model.app.createSessionObject(parameter)
             .then((genericObject: EngineAPI.IGenericObject) => {
                 this.engineGenericObjectVal = genericObject;
 
@@ -675,7 +690,7 @@ class SelectionsController implements ng.IController {
             case "clearselection":
                 this.textSearchDimension = "";
                 this.textSearchValue = "";
-                this.engineroot.app.clearAll(true).then(() => {
+                this.model.app.clearAll(true).then(() => {
                     this.statusText = "Selektionen wurden gelöscht";
                 }).catch((e: Error) => {
                     logger.error("error in shortcutHandlerClear", e);
@@ -808,8 +823,8 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
             controllerAs: "vm",
             scope: {},
             bindToController: {
-                engineroot: "<",
-                inverseDesign: "<?",
+                model: "<",
+                theme: "<?",
                 editMode: "<?"
             },
             compile: ():void => {

@@ -1,6 +1,6 @@
 
     <div class="root-container"
-         ng-class="{'root-container-inferse':vm.inverseDesign}"
+         ng-class="{'root-container-{{vm.theme}}':true}"
          tabindex="0"
          q2g-shortcut-scope="'rootelement'">
             <table q2g-shortcut
@@ -23,7 +23,7 @@
                                                   show-search-field="vm.showSearchFieldDimension"
                                                   title="vm.titleDimension"
                                                   callback-main-menu-button="vm.menuListActionCallback(item)"
-                                                  inverse-design="vm.inverseDesign">
+                                                  theme="vm.theme">
                             </q2g-extension-header>
                         </div>
                         <div style="position:relative"
@@ -42,7 +42,7 @@
                                           item-focused="vm.focusedPositionDimension"
                                           show-focused="vm.showFocusedDimension"
                                           callback-listview-objects="vm.selectDimensionObjectCallback(pos)"
-                                          inverse-design="vm.inverseDesign">
+                                          theme="vm.theme">
                             </q2g-listview>
                         </div>
 
@@ -61,7 +61,7 @@
                                               show-search-field="vm.showSearchFieldValues"
                                               title="vm.titleValues"
                                               callback-main-menu-button="vm.menuListActionCallback(item)"
-                                              inverse-design="vm.inverseDesign">
+                                              theme="vm.theme">
 
                         </q2g-extension-header>
                         <div style="position:relative"
@@ -91,7 +91,7 @@
                                           item-focused="vm.focusedPositionValues"
                                           show-focused="vm.showFocusedValue"
                                           callback-listview-objects="vm.selectListObjectCallback(pos, event)"
-                                          inverse-design="vm.inverseDesign">
+                                          theme="vm.theme">
                             </q2g-listview>
                         </div>
                     </td>
