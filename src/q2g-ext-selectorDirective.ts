@@ -89,13 +89,12 @@ class SelectionsController implements ng.IController {
     }
     set theme(value: string) {
         if (value !== this._theme) {
-            logger.info("THEME", value);
             this._theme = value;
         }
     }
     //#endregion
 
-    //#region egineRoot
+    //#region model
     private _model: EngineAPI.IGenericObject;
     get model(): EngineAPI.IGenericObject {
         return this._model;
@@ -103,29 +102,22 @@ class SelectionsController implements ng.IController {
     set model(value: EngineAPI.IGenericObject) {
         if (value !== this._model) {
             try {
-                logger.info("val", value);
+                logger.debug("val", value);
                 this._model = value;
                 let that = this;
                 this.model.on("changed", function () {
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
                         that.getProperties(res.properties);
-
                         if (!that.dimensionList.obj) {
-                            that.dimensionList = new Q2gListAdapter(
-                                new Q2gDimensionObject(
-                                    new utils.AssistHypercube(res)),
-                                utils.calcNumbreOfVisRows(that.elementHeight),
-                                res.qHyperCube.qDimensionInfo.length
-                            );
+                            let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
+                            that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight), res.qHyperCube.qDimensionInfo.length, "dimension");
                         } else {
                             that.dimensionList.updateList(
                                 new Q2gDimensionObject(
                                     new utils.AssistHypercube(res)),
                                 utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length);
-
-
                         }
                     });
                 });
@@ -584,7 +576,8 @@ class SelectionsController implements ng.IController {
                         new Q2gListObject(
                             genericObject),
                         utils.calcNumbreOfVisRows(this.elementHeight),
-                        res.qListObject.qDimensionInfo.qCardinal
+                        res.qListObject.qDimensionInfo.qCardinal,
+                        "qlik"
                     );
 
                     let that = this;
