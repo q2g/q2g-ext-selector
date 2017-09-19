@@ -109,6 +109,7 @@ class SelectionsController implements ng.IController {
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
                         that.getProperties(res.properties);
+
                         if (!that.dimensionList.obj) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
                             that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight), res.qHyperCube.qDimensionInfo.length, "dimension");
@@ -825,14 +826,14 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
                     "Listview");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ScrollBarDirectiveFactory(rootNameSpace),
                     "ScrollBar");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, StatusTextDirectiveFactory(rootNameSpace),
-                    "StatusText");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    StatusTextDirectiveFactory(rootNameSpace),"StatusText");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
                     "Shortcut");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, IdentifierDirectiveFactory(rootNameSpace),
-                    "AkquinetIdentifier");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ExtensionHeaderDirectiveFactory(rootNameSpace),
-                    "ExtensionHeader");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    IdentifierDirectiveFactory(rootNameSpace), "AkquinetIdentifier");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    ExtensionHeaderDirectiveFactory(rootNameSpace), "ExtensionHeader");
             }
         };
     };
