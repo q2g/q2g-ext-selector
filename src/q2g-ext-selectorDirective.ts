@@ -28,6 +28,15 @@ interface IShortcutProperties {
     shortcutFocusValueList: string;
     shortcutClearSelection: string;
 }
+
+interface IMenuElement {
+    type: string,
+    isVisible: boolean,
+    isEnabled: boolean,
+    icon: string,
+    name: string,
+    hasSeparator: boolean,
+}
 //#endregion
 
 //#region assist classes
@@ -68,8 +77,8 @@ class SelectionsController implements ng.IController {
     titleValues: string = "no Dimension Selected";
     showFocusedValue: boolean = false;
     showFocusedDimension: boolean = false;
-    menuListDimension: Array<any>;
-    menuListValues: Array<any>;
+    menuListDimension: Array<IMenuElement>;
+    menuListValues: Array<IMenuElement>;
     showSearchFieldDimension: boolean = false;
     showSearchFieldValues: boolean = false;
     editMode: boolean = false;
@@ -572,7 +581,6 @@ class SelectionsController implements ng.IController {
                 this.engineGenericObjectVal = genericObject;
 
                 genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
-
                     this.valueList = new Q2gListAdapter(
                         new Q2gListObject(
                             genericObject),
@@ -584,6 +592,9 @@ class SelectionsController implements ng.IController {
                     let that = this;
                     genericObject.on("changed", function () {
                         that.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(that.elementHeight));
+                        genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
+                            that.checkAvailabilityOfMenuListElements(res);
+                        });
                     });
                     genericObject.emit("changed");
                 });
@@ -803,6 +814,50 @@ class SelectionsController implements ng.IController {
 
         this.useReadebility = properties.useAccessibility;
 
+    }
+
+    private checkAvailabilityOfMenuListElements(object: EngineAPI.IGenericObjectProperties): void {
+
+        let stateCounts = object.qListObject.qDimensionInfo.qStateCounts;
+
+        // workaround
+        if (typeof this.menuListValues === "string") {
+            this.menuListValues = JSON.parse(this.menuListValues);
+        }
+        // end workaround
+
+        for (let x of this.menuListValues) {
+            x.isEnabled = true;
+        }
+
+        // select-excluded
+        if (stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0) {
+            this.menuListValues[6].isEnabled = false;
+        }
+
+        // select-alternative
+        if (stateCounts.qExcluded > 0) {
+            this.menuListValues[5].isEnabled = false;
+        }
+
+        // select - possible
+        if (stateCounts.qOption > 0) {
+            this.menuListValues[4].isEnabled = false;
+        }
+
+        // select - all
+        if (stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal || stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal) {
+            this.menuListValues[3].isEnabled = false;
+        }
+
+        // clear-selections
+        if (stateCounts.qSelected > 0) {
+            this.menuListValues[2].isEnabled = false;
+        }
+
+        // workaround
+        (this.menuListValues as any) = JSON.stringify(this.menuListValues);
+        // workaround end
     }
 }
 
