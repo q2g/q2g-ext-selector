@@ -37,7 +37,6 @@ class ListViewController implements ng.IController {
     hasFocusSearchField: boolean = false;
     ieItemsReadable: boolean = false;
     itemHeight: number;
-    items: IDataModelItem[];
     itemsCount: number = 0;
     itemsPageHeight: number;
     itemsPageTop: number;
@@ -47,7 +46,7 @@ class ListViewController implements ng.IController {
     showFocused: boolean = false;
     showScrollBar: boolean = false;
     timeout: ng.ITimeoutService;
-    overrideShortcuts: Array<IShortcutObject>
+    overrideShortcuts: Array<IShortcutObject>;
     //#endregion
 
     //#region logger
@@ -75,7 +74,32 @@ class ListViewController implements ng.IController {
         }
     }
     //#endregion
-       
+
+    //#region items
+    private _items: IDataModelItem[];
+    get items(): IDataModelItem[] {
+        return this._items;
+    }
+    set items(value: IDataModelItem[]) {
+        this._items = value;
+    }
+    //#endregion
+
+    //#region theme
+    private _theme: string;
+    get theme(): string {
+        if (this._theme) {
+            return this._theme;
+        }
+        return "default";
+    }
+    set theme(value: string) {
+        if (value !== this._theme) {
+            this._theme = value;
+        }
+    }
+    //#endregion
+
 
     static $inject = ["$timeout", "$element"];
 
@@ -172,7 +196,8 @@ class ListViewController implements ng.IController {
             case "pageDown":
                 try {
                     this.itemsPageTop -= this.itemsPageHeight;
-                    if (this.itemFocused >= this.itemsPageTop + this.itemsPageHeight && this.itemFocused <= this.itemsPageTop + this.itemsPageHeight * 2) {
+                    if (this.itemFocused >= this.itemsPageTop + this.itemsPageHeight && this.itemFocused
+                            <= this.itemsPageTop + this.itemsPageHeight * 2) {
                         if (this.itemFocused - this.itemsPageHeight < 0) {
                             this.itemFocused = 0;
                         } else {
@@ -207,7 +232,6 @@ class ListViewController implements ng.IController {
             return false;
         }
     }
-    
 }
 
 export function ListViewDirectiveFactory(rootNameSpace: string): ng.IDirectiveFactory {
@@ -229,7 +253,8 @@ export function ListViewDirectiveFactory(rootNameSpace: string): ng.IDirectiveFa
                 itemFocused: "=",
                 showFocused: "<",
                 callbackListviewObjects: "&",
-                overrideShortcuts: "<?"
+                overrideShortcuts: "<?",
+                theme: "<?"
             },
             compile: function () {
                 checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ShortCutDirectiveFactory, "Shortcut");

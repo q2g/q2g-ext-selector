@@ -7,8 +7,8 @@ import "css!./scrollBar.css";
 //#endregion
 
 class DragableBar {
-    
-    //#region VARIABLES 
+
+    //#region VARIABLES
     private _logger: Logging.Logger;
     private get logger(): Logging.Logger {
         if (!this._logger) {
@@ -19,7 +19,7 @@ class DragableBar {
             }
         }
         return this._logger;
-    };
+    }
 
     private element: JQuery;
     private elementDragable: JQuery;
@@ -101,7 +101,7 @@ class DragableBar {
             this.elementDragable[0].style.display = "none";
             this.logger.error("Error in Class DragableBar", err);
         }
-    };
+    }
 
     /**
      * resets the top position of the element
@@ -149,7 +149,7 @@ class DragableBar {
 }
 
 class ScrollBarController implements ng.IController {
-    
+
     public $onInit(): void {
         this.logger.debug("initial Run of ScrollBarController");
     }
@@ -240,6 +240,21 @@ class ScrollBarController implements ng.IController {
             }
         }
         return this._logger;
+    }
+    //#endregion
+
+    //#region theme
+    private _theme: string;
+    get theme(): string {
+        if (this._theme) {
+            return this._theme;
+        }
+        return "default";
+    }
+    set theme(value: string) {
+        if (value !== this._theme) {
+            this._theme = value;
+        }
     }
     //#endregion
 
@@ -351,7 +366,8 @@ export function ScrollBarDirectiveFactory(rootNameSpace: string): ng.IDirectiveF
                 itemsPageTop: "=",
                 itemsPageHeight: "<",
                 vertical: "<",
-                show: "<"
+                show: "<",
+                theme: "<?"
             }
         };
     };

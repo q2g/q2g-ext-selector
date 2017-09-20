@@ -10,17 +10,18 @@ let logger = new Logging.Logger("q2gListAdapter");
 //#endregion
 
 //#region interfaces
-interface q2gIListObject extends Event {
+interface Iq2gIListObject extends Event {
     getDataPage: (top: number, height: number) => Promise<any>;
     searchFor: (searchString: string) => Promise<any>;
 }
 //#endregion
 
-export class q2gListAdapter {
+export class Q2gListAdapter {
 
     //#region Variables
-    obj: q2gIListObject;
+    obj: Iq2gIListObject;
     itemsCounter: number;
+    type: string
     //#endregion
 
     //#region collection
@@ -67,7 +68,7 @@ export class q2gListAdapter {
         }
         return new Promise((resolve, reject) => {
             resolve(true);
-        })
+        });
     }
     //#endregion
 
@@ -77,10 +78,11 @@ export class q2gListAdapter {
      * @param itemsPagingHeight number of items visible on Page
      * @param itemsCounter number of items in the whole list
      */
-    constructor(obj: q2gIListObject, itemsPagingHeight: number, itemsCounter: number) {
+    constructor(obj: Iq2gIListObject, itemsPagingHeight: number, itemsCounter: number, type: string) {
         this.obj = obj;
+        this.type = type;
         this.itemsPagingHeight = itemsPagingHeight;
-        this.itemsCounter = itemsCounter; 
+        this.itemsCounter = itemsCounter;
         this.itemsPagingTop = 0;
 
         this.registrateChangeEvent();
@@ -89,13 +91,12 @@ export class q2gListAdapter {
     /**
      * writes the new data page in the collection
      */
-    private callData(): void {   
+    private callData(): void {
         logger.debug("callData", "");
 
         this.obj.getDataPage(this.itemsPagingTop, this.itemsPagingHeight)
             .then((collection: Array<any>) => {
-                
-                if (!this._collection || !checkEqualityOfArrays(this._collection, collection)) {
+                if (!this._collection || !checkEqualityOfArrays(this._collection, collection, (this.type === "qlik" ? true : false))) {
                     let counter: number = 0;
                     for (let x of collection) {
                         if (counter >= this.collection.length || JSON.stringify(x) !== JSON.stringify(this._collection[counter])) {
@@ -117,7 +118,7 @@ export class q2gListAdapter {
      * @param itemsPagingHeight
      * @param itemsCounter
      */
-    updateList(obj: q2gIListObject, itemsPagingHeight: number, itemsCounter: number) {
+    updateList(obj: Iq2gIListObject, itemsPagingHeight: number, itemsCounter: number) {
         this.obj = obj;
         this.itemsPagingHeight = itemsPagingHeight;
         this.itemsCounter = itemsCounter;
@@ -130,13 +131,13 @@ export class q2gListAdapter {
     registrateChangeEvent() {
         this.obj.on("changed", (args) => {
             this.itemsPagingHeight = args as any;
-            this.callData()
+            this.callData();
         });
         this.obj.emit("changed", this.itemsPagingHeight);
     }
 }
 
-export class q2gDimensionObject extends Event implements q2gIListObject {
+export class Q2gDimensionObject extends Event implements Iq2gIListObject {
 
     model: any;
 
@@ -165,9 +166,9 @@ export class q2gDimensionObject extends Event implements q2gIListObject {
                 .then((res: any) => {
                     let collection = [];
                     for (var j: number = 0; j < res.length; j++) {
-                        let matrix = res[j]
+                        let matrix = res[j];
                         collection.push({
-                            status: matrix.qStateCounts.qSelected,
+                            status: matrix.qState,
                             id: matrix.cId,
                             defs: matrix.qGroupFieldDefs,
                             title: matrix.qFallbackTitle,
@@ -179,9 +180,9 @@ export class q2gDimensionObject extends Event implements q2gIListObject {
                     logger.error("ERROR", e);
                     reject(e);
                 });
-        })
+        });
     }
-    
+
     /**
      * search for the enterd string in the root Object
      * @param searchString string to search for
@@ -190,16 +191,16 @@ export class q2gDimensionObject extends Event implements q2gIListObject {
         return new Promise((resolve, reject) => {
             this.model.searchListObjectFor(searchString)
                 .then(() => {
-                    resolve(true)
+                    resolve(true);
                 }).catch((e) => {
                     logger.error("error", e);
-                    reject()
+                    reject();
                 });
         });
     }
 }
 
-export class q2gListObject extends Event implements q2gIListObject {
+export class Q2gListObject extends Event implements Iq2gIListObject {
 
     model: EngineAPI.IGenericObject;
 
@@ -227,7 +228,7 @@ export class q2gListObject extends Event implements q2gIListObject {
             }])
                 .then((res: EngineAPI.INxDataPage[]) => {
                     let collection = [];
-                    
+
                     for (let item of res[0].qMatrix) {
                         let matrix = item[0];
                         collection.push({
@@ -242,7 +243,7 @@ export class q2gListObject extends Event implements q2gIListObject {
                     logger.error("ERROR", e);
                     reject(e);
                 });
-        })
+        });
     }
 
     /**
@@ -253,10 +254,10 @@ export class q2gListObject extends Event implements q2gIListObject {
         return new Promise((resolve, reject) => {
             this.model.searchListObjectFor("/qListObjectDef", searchString)
                 .then(() => {
-                    resolve(true)
+                    resolve(true);
                 }).catch((e) => {
                     logger.error("error", e);
-                    reject()
+                    reject();
                 });
         });
     }

@@ -3,6 +3,7 @@
 //#region Imports
 import "css!./q2g-ext-selector.css";
 import * as qvangular from "qvangular";
+import * as qlik from "qlik";
 import * as template from "text!./q2g-ext-selector.html";
 import * as langDE from "text!./translate/de-DE/propertypanel.js";
 import * as langEN from "text!./translate/en-US/propertypanel.js";
@@ -178,13 +179,21 @@ let parameter = {
 
 
 class SelectionExtension {
-    constructor(enigmaRoot: EngineAPI.IGenericObject) {
+    constructor(model: EngineAPI.IGenericObject) {
         logger.debug("Constructor of Selection Extension", "");
 
-        this.engineRoot = enigmaRoot;
+        this.model = model;
     }
 
-    engineRoot: EngineAPI.IGenericObject;
+    model: EngineAPI.IGenericObject;
+
+    public isEditMode() {
+        if (qlik.navigation.getMode() === "analysis") {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 }
 

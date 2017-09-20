@@ -1,8 +1,8 @@
 
     <div class="root-container"
+         ng-class="{'root-container-{{vm.theme}}':true}"
          tabindex="0"
          q2g-shortcut-scope="'rootelement'">
-
             <table q2g-shortcut
                    shortcut="[{name:'clearselection', shortcut:vm.properties.shortcutClearSelection}]"
                    shortcut-action="vm.shortcutHandler(objectShortcut)"
@@ -15,15 +15,15 @@
                         shortcut-action="vm.shortcutHandler(objectShortcut)">
                         <div>
                             <q2g-extension-header menu-list="vm.menuListDimension"
-                                           max-number-of-elements="4"
-                                           reserved-button-width="0.5"
-                                           text-search="vm.textSearchDimension"
-                                           shortcut-searchfield="'strg + alt + 83'"
-                                           show-buttons="vm.showButtonsDimension"
-                                           show-search-field="vm.showSearchFieldDimension"
-                                           title="vm.titleDimension"
-                                           callback-main-menu-button="vm.menuListActionCallback(item)">
-
+                                                  max-number-of-elements="4"
+                                                  reserved-button-width="0.5"
+                                                  text-search="vm.textSearchDimension"
+                                                  shortcut-searchfield="'strg + alt + 83'"
+                                                  show-buttons="vm.showButtonsDimension"
+                                                  show-search-field="vm.showSearchFieldDimension"
+                                                  title="vm.titleDimension"
+                                                  callback-main-menu-button="vm.menuListActionCallback(item)"
+                                                  theme="vm.theme">
                             </q2g-extension-header>
                         </div>
                         <div style="position:relative"
@@ -41,7 +41,8 @@
                                           item-height="31"
                                           item-focused="vm.focusedPositionDimension"
                                           show-focused="vm.showFocusedDimension"
-                                          callback-listview-objects="vm.selectDimensionObjectCallback(pos)">
+                                          callback-listview-objects="vm.selectDimensionObjectCallback(pos)"
+                                          theme="vm.theme">
                             </q2g-listview>
                         </div>
 
@@ -52,14 +53,15 @@
                         shortcut="[{name:'escValues', shortcut:'27'}]"
                         shortcut-action="vm.shortcutHandler(objectShortcut)">
                         <q2g-extension-header menu-list="vm.menuListValues"
-                                       max-number-of-elements="4"
-                                       reserved-button-width="0.5"
-                                       text-search="vm.textSearchValue"
-                                       shortcut-searchfield="'strg + alt + 83'"
-                                       show-buttons="vm.showButtonsValue"
-                                       show-search-field="vm.showSearchFieldValues"
-                                       title="vm.titleValues"
-                                       callback-main-menu-button="vm.menuListActionCallback(item)">
+                                              max-number-of-elements="4"
+                                              reserved-button-width="0.5"
+                                              text-search="vm.textSearchValue"
+                                              shortcut-searchfield="'strg + alt + 83'"
+                                              show-buttons="vm.showButtonsValue"
+                                              show-search-field="vm.showSearchFieldValues"
+                                              title="vm.titleValues"
+                                              callback-main-menu-button="vm.menuListActionCallback(item)"
+                                              theme="vm.theme">
 
                         </q2g-extension-header>
                         <div style="position:relative"
@@ -88,7 +90,8 @@
                                           item-height="31"
                                           item-focused="vm.focusedPositionValues"
                                           show-focused="vm.showFocusedValue"
-                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)">
+                                          callback-listview-objects="vm.selectListObjectCallback(pos, event)"
+                                          theme="vm.theme">
                             </q2g-listview>
                         </div>
                     </td>

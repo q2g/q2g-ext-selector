@@ -12,7 +12,7 @@ class StatusTextController implements ng.IController {
     element: JQuery;
     statustime: number;
 
-    //#region logger 
+    //#region logger
     private _logger: Logging.Logger;
     private get logger(): Logging.Logger {
         if (!this._logger) {
@@ -25,7 +25,7 @@ class StatusTextController implements ng.IController {
         return this._logger;
     }
     //#endregion
-    
+
     //#region statustext
     private _statustext: string;
     get statustext(): string {
@@ -35,7 +35,7 @@ class StatusTextController implements ng.IController {
         if (value !== this.statustext) {
             try {
                 this._statustext = value;
-                // better way would be with angular ng-repeat and an array object, but there is a bug in Jaws 
+                // better way would be with angular ng-repeat and an array object, but there is a bug in Jaws
                 // wich do not read the correct text so following workaround:
                 this.element.prepend("<li class='listElement'>" + this.statustext + "</li>");
                 this.timeout(() => {
@@ -44,6 +44,21 @@ class StatusTextController implements ng.IController {
             } catch (e) {
                 this.logger.error("error in SETTER of statustext", e);
             }
+        }
+    }
+    //#endregion
+
+    //#region theme
+    private _theme: string;
+    get theme(): string {
+        if (this._theme) {
+            return this._theme;
+        }
+        return "default";
+    }
+    set theme(value: string) {
+        if (value !== this._theme) {
+            this._theme = value;
         }
     }
     //#endregion
@@ -86,7 +101,8 @@ export function StatusTextDirectiveFactory(rootNameSpace: string): ng.IDirective
             scope: {},
             bindToController: {
                 statustext: "<",
-                statustime: "<?"
+                statustime: "<?",
+                theme: "<?"
             }
         };
     };
