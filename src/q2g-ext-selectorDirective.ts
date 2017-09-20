@@ -821,45 +821,23 @@ class SelectionsController implements ng.IController {
 
         let stateCounts = object.qListObject.qDimensionInfo.qStateCounts;
 
-        // workaround
-        if (typeof this.menuListValues === "string") {
-            this.menuListValues = JSON.parse(this.menuListValues);
-        }
-        // end workaround
-
-        for (let x of this.menuListValues) {
-            x.isEnabled = true;
-        }
-
         // select-excluded
-        if (stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0) {
-            this.menuListValues[6].isEnabled = false;
-        }
+        this.menuListValues[6].isEnabled = !(stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0);
 
         // select-alternative
-        if (stateCounts.qExcluded > 0) {
-            this.menuListValues[5].isEnabled = false;
-        }
+        this.menuListValues[5].isEnabled = !(stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0);
 
         // select - possible
-        if (stateCounts.qOption > 0) {
-            this.menuListValues[4].isEnabled = false;
-        }
+        this.menuListValues[4].isEnabled = !(stateCounts.qOption > 0);
 
         // select - all
-        if (stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal ||
-                stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal) {
-            this.menuListValues[3].isEnabled = false;
-        }
+        this.menuListValues[3].isEnabled = !(stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal ||
+                stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal);
 
         // clear-selections
-        if (stateCounts.qSelected > 0) {
-            this.menuListValues[2].isEnabled = false;
-        }
+        this.menuListValues[2].isEnabled = !(stateCounts.qSelected > 0);
 
-        // workaround
-        (this.menuListValues as any) = JSON.stringify(this.menuListValues);
-        // workaround end
+        this.menuListValues = JSON.parse(JSON.stringify(this.menuListValues));
     }
 }
 
