@@ -30,12 +30,12 @@ interface IShortcutProperties {
 }
 
 interface IMenuElement {
-    type: string,
-    isVisible: boolean,
-    isEnabled: boolean,
-    icon: string,
-    name: string,
-    hasSeparator: boolean,
+    type: string;
+    isVisible: boolean;
+    isEnabled: boolean;
+    icon: string;
+    name: string;
+    hasSeparator: boolean;
 }
 //#endregion
 
@@ -121,7 +121,8 @@ class SelectionsController implements ng.IController {
 
                         if (!that.dimensionList.obj) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
-                            that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight), res.qHyperCube.qDimensionInfo.length, "dimension");
+                            that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
+                                    res.qHyperCube.qDimensionInfo.length, "dimension");
                         } else {
                             that.dimensionList.updateList(
                                 new Q2gDimensionObject(
@@ -846,7 +847,8 @@ class SelectionsController implements ng.IController {
         }
 
         // select - all
-        if (stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal || stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal) {
+        if (stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal ||
+                stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal) {
             this.menuListValues[3].isEnabled = false;
         }
 
