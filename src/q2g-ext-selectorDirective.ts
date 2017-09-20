@@ -161,7 +161,7 @@ class SelectionsController implements ng.IController {
                     this.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
                 }
             } catch (err) {
-                console.error("error in setter of elementHeight", err);
+                logger.error("error in setter of elementHeight", err);
             }
         }
     }
