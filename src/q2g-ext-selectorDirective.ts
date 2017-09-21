@@ -1,5 +1,4 @@
 ﻿
-//#region Imports
 import { Logging } from "./lib/daVinci.js/src/utils/logger";
 import { ListViewDirectiveFactory, IDataModelItem } from "./lib/daVinci.js/src/directives/listview";
 import { ScrollBarDirectiveFactory } from "./lib/daVinci.js/src/directives/scrollBar";
@@ -11,13 +10,13 @@ import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci
 
 import * as utils from "./lib/daVinci.js/src/utils/utils";
 import * as template from "text!./q2g-ext-selectorDirective.html";
-//#endregion
 
-//#region Logger
+
+
 let logger = new Logging.Logger("q2g-ext-selectorDrective");
-//#endregion
 
-//#region interfaces
+
+
 interface IVMScope<T> extends ExtensionAPI.IExtensionScope {
     vm: T;
 }
@@ -37,9 +36,7 @@ interface IMenuElement {
     name: string;
     hasSeparator: boolean;
 }
-//#endregion
 
-//#region assist classes
 class ListsInformation {
     maxNumberOfRows: number = 0;
     numberOfVisibleRows: number = 0;
@@ -50,7 +47,6 @@ class DataModel {
     dimensionListBackup: Array<IDataModelItem> = [];
     valueList: Array<IDataModelItem> = [];
 }
-//#endregion
 
 class SelectionsController implements ng.IController {
 
@@ -59,36 +55,85 @@ class SelectionsController implements ng.IController {
     }
 
     //#region Variables
-    element: JQuery;
-    timeout: ng.ITimeoutService;
-    dimensionList: Q2gListAdapter;
-    valueList: Q2gListAdapter;
-    statusText: string;
-    timeAriaIntervall: number = 0;
     actionDelay: number = 0;
-    properties: IShortcutProperties = {
+    dimensionList: Q2gListAdapter;
+    editMode: boolean = false;
+    element: JQuery;properties: IShortcutProperties = {
         shortcutFocusDimensionList: " ",
         shortcutFocusSearchField: " ",
         shortcutFocusValueList: " ",
         shortcutClearSelection: " ",
     };
-    useReadebility: boolean = false;
-    titleDimension: string = "Dimensions";
-    titleValues: string = "no Dimension Selected";
-    showFocusedValue: boolean = false;
-    showFocusedDimension: boolean = false;
     menuListDimension: Array<IMenuElement>;
     menuListValues: Array<IMenuElement>;
+    statusText: string;
+    showFocusedDimension: boolean = false;
+    showFocusedValue: boolean = false;
     showSearchFieldDimension: boolean = false;
     showSearchFieldValues: boolean = false;
-    editMode: boolean = false;
+    timeAriaIntervall: number = 0;
+    timeout: ng.ITimeoutService;
+    titleDimension: string = "Dimensions";
+    titleValues: string = "no Dimension Selected";
+    useReadebility: boolean = false;
+    valueList: Q2gListAdapter;
 
+    private engineGenericObjectVal: EngineAPI.IGenericObject;
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
-    private engineGenericObjectVal: EngineAPI.IGenericObject;
-    //#endregion
 
-    //#region theme
+    private _inputAcceptValues: boolean = false;
+    get inputAcceptValues (): boolean {
+        return this._inputAcceptValues;
+    }
+    set inputAcceptValues (value: boolean) {
+        if(this._inputAcceptValues !== value) {
+            try {
+                this.valueList.obj.acceptListObjectSearch(false)
+                    .then(() => {
+                        this._inputAcceptValues = false;
+                        this.showSearchFieldValues = false;
+                        this.textSearchValue = "";
+                    }).catch((error) => {
+                        logger.error("Error in setter of input Accept Dimension", error);
+                    });
+            } catch (error) {
+                logger.error("Error in setter of input Accept", error);
+                this._inputAcceptValues = false;
+            }
+
+            this._inputAcceptValues = value;
+        }
+    }
+
+    private _inputCancelValues: boolean = false;
+    get inputCancelValues(): boolean {
+        return this._inputCancelValues;
+    }
+    set inputCancelValues(value: boolean) {
+        if(value!==this._inputCancelValues) {
+            this._inputCancelValues = value;
+        }
+    }
+
+    private _inputAcceptDimensions: boolean = false;
+    public get inputAcceptDimensions() : boolean {
+        return this._inputAcceptDimensions;
+    }
+    public set inputAcceptDimensions(v : boolean) {
+        if (v !== this._inputAcceptDimensions) {
+            if(this.dimensionList.collection.length === 1) {
+                this.createValueListSessionObjcet(this.dimensionList.collection[0].title, this.dimensionList.collection[0].defs);
+                this.dimensionList.collection[0].status = "S";
+                this.textSearchDimension = "";
+                this.showSearchFieldDimension = false;
+            }
+            this._inputAcceptDimensions = v;
+            this._inputAcceptDimensions = false;
+        }
+    }
+
+
     private _theme: string;
     get theme(): string {
         if (this._theme) {
@@ -101,7 +146,6 @@ class SelectionsController implements ng.IController {
             this._theme = value;
         }
     }
-    //#endregion
 
     //#region model
     private _model: EngineAPI.IGenericObject;
@@ -594,7 +638,7 @@ class SelectionsController implements ng.IController {
                     genericObject.on("changed", function () {
                         that.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(that.elementHeight));
                         genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
-                            that.checkAvailabilityOfMenuListElements(res);
+                            that.checkAvailabilityOfMenuListElements(res.qListObject.qDimensionInfo);
                         });
                     });
                     genericObject.emit("changed");
@@ -817,25 +861,27 @@ class SelectionsController implements ng.IController {
 
     }
 
-    private checkAvailabilityOfMenuListElements(object: EngineAPI.IGenericObjectProperties): void {
+    private checkAvailabilityOfMenuListElements(object: any): void {
 
-        let stateCounts = object.qListObject.qDimensionInfo.qStateCounts;
+        // let stateCounts = object.qListObject.qDimensionInfo.qStateCounts;
 
         // select-excluded
-        this.menuListValues[6].isEnabled = !(stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0);
+        this.menuListValues[6].isEnabled = !(object.qStateCounts.qExcluded > 0 || object.qStateCounts.qAlternative > 0);
 
         // select-alternative
-        this.menuListValues[5].isEnabled = !(stateCounts.qExcluded > 0 || stateCounts.qAlternative > 0);
+        this.menuListValues[5].isEnabled = !(object.qStateCounts.qExcluded > 0 || object.qStateCounts.qAlternative > 0);
 
         // select - possible
-        this.menuListValues[4].isEnabled = !(stateCounts.qOption > 0);
+        this.menuListValues[4].isEnabled = !(object.qStateCounts.qOption > 0);
 
         // select - all
-        this.menuListValues[3].isEnabled = !(stateCounts.qSelected + stateCounts.qSelectedExcluded !== object.qListObject.qDimensionInfo.qCardinal ||
-                stateCounts.qOption === object.qListObject.qDimensionInfo.qCardinal);
+        this.menuListValues[3].isEnabled = !(object.qStateCounts.qSelected + object.qStateCounts.qSelectedExcluded
+                !== object.qCardinal
+            || object.qStateCounts.qOption
+                === object.qCardinal);
 
         // clear-selections
-        this.menuListValues[2].isEnabled = !(stateCounts.qSelected > 0);
+        this.menuListValues[2].isEnabled = !(object.qStateCounts.qSelected > 0);
 
         this.menuListValues = JSON.parse(JSON.stringify(this.menuListValues));
     }
