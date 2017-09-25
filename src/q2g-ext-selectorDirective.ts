@@ -29,10 +29,12 @@ interface IShortcutProperties {
 }
 
 interface IMenuElement {
-    type: string;
+    buttonType: string;
     isVisible: boolean;
     isEnabled: boolean;
+    isChecked?: boolean;
     icon: string;
+    type: "menu" | "submenu" | "checkbox";
     name: string;
     hasSeparator: boolean;
 }
@@ -66,6 +68,7 @@ class SelectionsController implements ng.IController {
     };
     menuListDimension: Array<IMenuElement>;
     menuListValues: Array<IMenuElement>;
+    selectedDimensioId: Array<number>;
     statusText: string;
     showFocusedDimension: boolean = false;
     showFocusedValue: boolean = false;
@@ -81,6 +84,22 @@ class SelectionsController implements ng.IController {
     private engineGenericObjectVal: EngineAPI.IGenericObject;
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
+
+    private _lockMenuListValues: boolean = false;
+    get lockMenuListValues() : boolean {
+        return this._lockMenuListValues;
+    }
+    set lockMenuListValues(v : boolean) {
+        if(v !== this._lockMenuListValues) {
+            if (this._lockMenuListValues) {
+                (this.engineGenericObjectVal.unlock as any)("/qListObjectDef")
+                    .catch((e) => {
+                        logger.error("Error in Setter of lockMenuListValues", e);
+                    });
+            }
+            this._lockMenuListValues = v;
+        }
+    }
 
     private _inputAcceptValues: boolean = false;
     get inputAcceptValues (): boolean {
@@ -133,7 +152,6 @@ class SelectionsController implements ng.IController {
         }
     }
 
-
     private _theme: string;
     get theme(): string {
         if (this._theme) {
@@ -161,12 +179,13 @@ class SelectionsController implements ng.IController {
                 this.model.on("changed", function () {
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
+                        that.checkAvailabilityOfMenuListElementsDimension();
                         that.getProperties(res.properties);
 
                         if (!that.dimensionList.obj) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
                             that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
-                                    res.qHyperCube.qDimensionInfo.length, "dimension");
+                                res.qHyperCube.qDimensionInfo.length, "dimension");
                         } else {
                             that.dimensionList.updateList(
                                 new Q2gDimensionObject(
@@ -196,9 +215,11 @@ class SelectionsController implements ng.IController {
 
                 if (this.dimensionList) {
                     this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
+                    this.selectDimensionObjectCallback(0);
                 } else {
                     this.timeout(() => {
                         this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
+                        this.selectDimensionObjectCallback(0);
                     }, 200);
                 }
                 if (this.valueList && this.valueList.obj) {
@@ -407,63 +428,117 @@ class SelectionsController implements ng.IController {
      */
     private initMenuElements(): void {
         this.menuListDimension = [];
+        this.menuListDimension.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: false,
+            icon: "clear-selections",
+            name: "Clear all selections",
+            hasSeparator: false,
+            type: "menu"
+
+        });
+        this.menuListDimension.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: true,
+            icon: "selections-forward",
+            name: "Step forward",
+            hasSeparator: false,
+            type: "menu"
+        });
+        this.menuListDimension.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: true,
+            icon: "selections-back",
+            name: "Step backward",
+            hasSeparator: false,
+            type: "menu"
+        });
+        this.menuListDimension.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: false,
+            icon: "unlock",
+            name: "Lock all dimension",
+            hasSeparator: false,
+            type: "menu"
+        });
+
         this.menuListValues = [];
         this.menuListValues.push({
-            type: "success",
+            buttonType: "success",
             isVisible: true,
             isEnabled: true,
             icon: "tick",
             name: "Confirm Selection",
             hasSeparator: false,
+            type: "menu"
 
         });
         this.menuListValues.push({
-            type: "danger",
+            buttonType: "danger",
             isVisible: true,
             isEnabled: false,
             icon: "close",
             name: "Cancle Selection",
-            hasSeparator: true
+            hasSeparator: true,
+            type: "menu"
         });
         this.menuListValues.push({
-            type: "",
+            buttonType: "",
             isVisible: true,
             isEnabled: false,
             icon: "clear-selections",
             name: "clear",
-            hasSeparator: false
+            hasSeparator: false,
+            type: "menu"
         });
         this.menuListValues.push({
-            type: "",
+            buttonType: "",
             isVisible: true,
             isEnabled: true,
             icon: "select-all",
             name: "Select all",
-            hasSeparator: false
+            hasSeparator: false,
+            type: "menu"
         });
         this.menuListValues.push({
-            type: "",
+            buttonType: "",
             isVisible: true,
             isEnabled: false,
             icon: "select-possible",
             name: "Select possible",
-            hasSeparator: false
+            hasSeparator: false,
+            type: "menu"
         });
         this.menuListValues.push({
-            type: "",
+            buttonType: "",
             isVisible: true,
             isEnabled: true,
             icon: "select-alternative",
             name: "Select alternative",
-            hasSeparator: false
+            hasSeparator: false,
+            type: "menu"
         });
         this.menuListValues.push({
-            type: "",
+            buttonType: "",
             isVisible: true,
             isEnabled: true,
             icon: "select-excluded",
             name: "Select excluded",
-            hasSeparator: false
+            hasSeparator: false,
+            type: "menu"
+        });
+        this.menuListValues.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: false,
+            icon: "unlock",
+            name: "Lock dimension",
+            hasSeparator: false,
+            type: "menu"
         });
     }
 
@@ -498,6 +573,24 @@ class SelectionsController implements ng.IController {
             case "Select excluded":
                 this.engineGenericObjectVal.selectListObjectExcluded("/qListObjectDef");
                 break;
+            case "Clear all selections":
+                this.model.app.clearAll(true);
+                break;
+            case "Step forward":
+                this.model.app.forward();
+                break;
+            case "Step backward":
+                this.model.app.back();
+                break;
+            case "Lock dimension":
+                this.lockMenuListValues = true;
+                (this.engineGenericObjectVal.lock as any)("/qListObjectDef");
+                break;
+            case "Lock all dimension":
+                this.lockMenuListValues = true;
+                (this.model.app.lockAll as any)();
+                break;
+
         }
     }
 
@@ -519,6 +612,7 @@ class SelectionsController implements ng.IController {
                     // dimension
                     this.selectedDimension = this.dimensionList.collection[pos].title;
                     this.selectedDimensionDefs = this.dimensionList.collection[pos].defs;
+                    this.selectedDimensioId = this.dimensionList.collection[pos].id;
                     this.focusedPositionDimension = pos + this.dimensionList.itemsPagingTop;
                     this.dimensionList.collection[pos].status = "S";
 
@@ -550,7 +644,7 @@ class SelectionsController implements ng.IController {
             this.showButtonsValue = true;
 
             this.engineGenericObjectVal.selectListObjectValues(
-                "/qListObjectDef", [this.valueList.collection[pos].id], (event && event.ctrlKey) ? false : true)
+                "/qListObjectDef", this.valueList.collection[pos].id, (event && event.ctrlKey) ? false : true)
                 .then(() => {
                     this.focusedPositionValues = pos + this.valueList.itemsPagingTop;
                     this.valueList.itemsPagingTop = assistItemsPagingTop;
@@ -638,7 +732,8 @@ class SelectionsController implements ng.IController {
                     genericObject.on("changed", function () {
                         that.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(that.elementHeight));
                         genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
-                            that.checkAvailabilityOfMenuListElements(res.qListObject.qDimensionInfo);
+                            that.checkAvailabilityOfMenuListElementsValue(res.qListObject.qDimensionInfo);
+                            that.checkIfDimIsLocked(res.qListObject.qDimensionInfo);
                         });
                     });
                     genericObject.emit("changed");
@@ -861,9 +956,7 @@ class SelectionsController implements ng.IController {
 
     }
 
-    private checkAvailabilityOfMenuListElements(object: any): void {
-
-        // let stateCounts = object.qListObject.qDimensionInfo.qStateCounts;
+    private checkAvailabilityOfMenuListElementsValue(object: any): void {
 
         // select-excluded
         this.menuListValues[6].isEnabled = !(object.qStateCounts.qExcluded > 0 || object.qStateCounts.qAlternative > 0);
@@ -884,6 +977,23 @@ class SelectionsController implements ng.IController {
         this.menuListValues[2].isEnabled = !(object.qStateCounts.qSelected > 0);
 
         this.menuListValues = JSON.parse(JSON.stringify(this.menuListValues));
+    }
+
+    private checkAvailabilityOfMenuListElementsDimension(): void {
+
+        let promForward: Promise<any> = this.model.app.forwardCount();
+        let promBackward: Promise<any> = this.model.app.backCount();
+
+        Promise.all([promForward, promBackward])
+            .then((res:Array<any>) => {
+                this.menuListDimension[1].isEnabled = res[0]>0 ? false : true;
+                this.menuListDimension[2].isEnabled = res[1]>0 ? false : true;
+                this.menuListDimension = JSON.parse(JSON.stringify(this.menuListDimension));
+            });
+    }
+
+    private checkIfDimIsLocked(obj: EngineAPI.INxStateCounts) {
+        this.lockMenuListValues = obj.qLocked > 0 || obj.qLockedExcluded > 0 ? true : false;
     }
 }
 
