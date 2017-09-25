@@ -79,10 +79,28 @@ class SelectionsController implements ng.IController {
     titleValues: string = "no Dimension Selected";
     useReadebility: boolean = false;
     valueList: Q2gListAdapter;
+    selectedDimensioId: number;
 
     private engineGenericObjectVal: EngineAPI.IGenericObject;
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
+
+    private _lockMenuListValues: boolean = false;
+    get lockMenuListValues() : boolean {
+        return this._lockMenuListValues;
+    }
+    set lockMenuListValues(v : boolean) {
+        this._lockMenuListValues = v;
+        if(v !== this._lockMenuListValues) {
+            if (this._lockMenuListValues) {
+                this.engineGenericObjectVal.app.unlockAll("/qListObjectDef")
+                    .catch((e) => {
+                        logger.info("Error in Setter of lockMenuListValues", e);
+                    });
+            }
+            this._lockMenuListValues = v;
+        }
+    }
 
     private _inputAcceptValues: boolean = false;
     get inputAcceptValues (): boolean {
@@ -503,6 +521,15 @@ class SelectionsController implements ng.IController {
             hasSeparator: false,
             type: "menu"
         });
+        this.menuListValues.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: false,
+            icon: "unlock",
+            name: "Lock dimension",
+            hasSeparator: false,
+            type: "menu"
+        });
     }
 
     /**
@@ -545,6 +572,11 @@ class SelectionsController implements ng.IController {
             case "Step backward":
                 this.model.app.back();
                 break;
+            case "Lock dimension":
+                this.lockMenuListValues = true;
+                (this.engineGenericObjectVal as any).lock("/qListObjectDef");
+                break;
+
         }
     }
 
@@ -566,6 +598,7 @@ class SelectionsController implements ng.IController {
                     // dimension
                     this.selectedDimension = this.dimensionList.collection[pos].title;
                     this.selectedDimensionDefs = this.dimensionList.collection[pos].defs;
+                    this.selectedDimensioId = this.dimensionList.collection[pos].id;
                     this.focusedPositionDimension = pos + this.dimensionList.itemsPagingTop;
                     this.dimensionList.collection[pos].status = "S";
 
