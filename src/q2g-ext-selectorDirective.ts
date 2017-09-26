@@ -11,11 +11,7 @@ import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci
 import * as utils from "./lib/daVinci.js/src/utils/utils";
 import * as template from "text!./q2g-ext-selectorDirective.html";
 
-
-
 let logger = new Logging.Logger("q2g-ext-selectorDrective");
-
-
 
 interface IVMScope<T> extends ExtensionAPI.IExtensionScope {
     vm: T;
@@ -177,6 +173,11 @@ class SelectionsController implements ng.IController {
                 this._model = value;
                 let that = this;
                 this.model.on("changed", function () {
+
+                    // this.getProperties().then((res: EngineAPI.IGenericObjectProperties) => {
+                    //     logger.info("res", res);
+                    // });
+
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
                         that.checkAvailabilityOfMenuListElementsDimension();
@@ -948,11 +949,11 @@ class SelectionsController implements ng.IController {
         this.properties.shortcutClearSelection = properties.shortcutClearSelection;
 
         if (properties.useAccessibility) {
-            this.timeAriaIntervall = parseInt(properties.timeAria, 10);
-            this.actionDelay = parseInt(properties.actionDelay, 10);
+            this.timeAriaIntervall = parseInt(properties.aria.timeAria, 10);
+            this.actionDelay = parseInt(properties.aria.actionDelay, 10);
         }
 
-        this.useReadebility = properties.useAccessibility;
+        this.useReadebility = properties.aria.useAccessibility;
 
     }
 
