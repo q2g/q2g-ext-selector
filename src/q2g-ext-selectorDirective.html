@@ -2,13 +2,13 @@
     <div class="root-container"
          ng-class="{'root-container-{{vm.theme}}':true}"
          tabindex="0"
-         q2g-shortcut-scope="'rootelement'">
+         q2g-shortcut-scope="rootelement">
             <table q2g-shortcut
                    shortcut="[{name:'clearselection', shortcut:vm.properties.shortcutClearSelection}]"
                    shortcut-action="vm.shortcutHandler(objectShortcut)"
                    class="rootTable">
                 <tr>
-                    <td q2g-shortcut-scope="'dimensionelement'"
+                    <td q2g-shortcut-scope
                         class="doublePage dimensionList"
                         q2g-shortcut
                         shortcut="[{name:'escDimension', shortcut:'27'}]"
@@ -49,7 +49,7 @@
                         </div>
 
                     </td>
-                    <td q2g-shortcut-scope="'valueelement'"
+                    <td q2g-shortcut-scope
                         class="doublePage valueList"
                         q2g-shortcut
                         shortcut="[{name:'escValues', shortcut:'27'}]"

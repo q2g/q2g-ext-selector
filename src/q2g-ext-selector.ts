@@ -43,7 +43,8 @@ let parameter = {
     component: "accordion",
     items: {
         dimensions: {
-            uses: "dimensions"
+            uses: "dimensions",
+            min: 0
         },
         settings: {
             uses: "settings",
@@ -136,7 +137,7 @@ let parameter = {
                                     component: "text"
                                 },
                                 useAccessibility: {
-                                    ref: "properties.useAccessibility",
+                                    ref: "properties.aria.useAccessibility",
                                     label: "use accessibility",
                                     component: "switch",
                                     type: "boolean",
@@ -150,7 +151,7 @@ let parameter = {
                                     defaultValue: false
                                 },
                                 timeAria: {
-                                    ref: "properties.timeAria",
+                                    ref: "properties.aria.timeAria",
                                     label: "Timeinterval for hints",
                                     type: "string",
                                     defaultValue: "7000",
@@ -159,7 +160,7 @@ let parameter = {
                                     }
                                 },
                                 actionDelay: {
-                                    ref: "properties.actionDelay",
+                                    ref: "properties.aria.actionDelay",
                                     label: "Delay bevor action (used for Aria Live Regions)",
                                     type: "string",
                                     defaultValue: "100",
@@ -201,11 +202,14 @@ export = {
     definition: parameter,
     initialProperties: { },
     template: template,
+    support : {
+        export: true
+    },
     controller: ["$scope", function (
         scope: IVMScope<SelectionExtension>) {
         logger.debug("Initialice Extension");
         scope.vm = new SelectionExtension(getEnigma(scope));
     }]
-}
+};
 
 
