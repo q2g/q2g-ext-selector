@@ -183,7 +183,7 @@ class SelectionsController implements ng.IController {
                         that.checkAvailabilityOfMenuListElementsDimension();
                         that.getProperties(res.properties);
 
-                        if (!that.dimensionList.obj) {
+                        if (!that.dimensionList) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
                             that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length, "dimension");
@@ -942,19 +942,18 @@ class SelectionsController implements ng.IController {
      * saves the Properties from the getLayout call from qlik enine in own Object
      * @param properties Properties from getLayout call
      */
-    private getProperties(properties: any): void {
-        this.properties.shortcutFocusDimensionList = properties.shortcutFocusDimensionList;
-        this.properties.shortcutFocusValueList = properties.shortcutFocusValueList;
-        this.properties.shortcutFocusSearchField = properties.shortcutFocusSearchField;
-        this.properties.shortcutClearSelection = properties.shortcutClearSelection;
-
-        if (properties.useAccessibility) {
-            this.timeAriaIntervall = parseInt(properties.aria.timeAria, 10);
-            this.actionDelay = parseInt(properties.aria.actionDelay, 10);
-        }
-
-        this.useReadebility = properties.aria.useAccessibility;
-
+    private getProperties(properties: any): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            this.properties.shortcutFocusDimensionList = properties.shortcutFocusDimensionList;
+            this.properties.shortcutFocusValueList = properties.shortcutFocusValueList;
+            this.properties.shortcutFocusSearchField = properties.shortcutFocusSearchField;
+            this.properties.shortcutClearSelection = properties.shortcutClearSelection;
+            if (properties.useAccessibility) {
+                this.timeAriaIntervall = parseInt(properties.aria.timeAria, 10);
+                this.actionDelay = parseInt(properties.aria.actionDelay, 10);
+            }
+            this.useReadebility = properties.aria.useAccessibility;
+        });
     }
 
     private checkAvailabilityOfMenuListElementsValue(object: any): void {
