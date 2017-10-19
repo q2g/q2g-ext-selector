@@ -80,7 +80,9 @@ class SelectionsController implements ng.IController {
     private engineGenericObjectVal: EngineAPI.IGenericObject;
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
+    //#endregion
 
+    //#region lockMenuListValues
     private _lockMenuListValues: boolean = false;
     get lockMenuListValues() : boolean {
         return this._lockMenuListValues;
@@ -96,7 +98,9 @@ class SelectionsController implements ng.IController {
             this._lockMenuListValues = v;
         }
     }
+    //#endregion
 
+    //#region inputAcceptValues
     private _inputAcceptValues: boolean = false;
     get inputAcceptValues (): boolean {
         return this._inputAcceptValues;
@@ -120,7 +124,9 @@ class SelectionsController implements ng.IController {
             this._inputAcceptValues = value;
         }
     }
+    //#endregion
 
+    //#region inputCancelValues
     private _inputCancelValues: boolean = false;
     get inputCancelValues(): boolean {
         return this._inputCancelValues;
@@ -130,7 +136,9 @@ class SelectionsController implements ng.IController {
             this._inputCancelValues = value;
         }
     }
+    //#endregion
 
+    //#region inputAcceptDimension
     private _inputAcceptDimensions: boolean = false;
     public get inputAcceptDimensions() : boolean {
         return this._inputAcceptDimensions;
@@ -147,7 +155,9 @@ class SelectionsController implements ng.IController {
             this._inputAcceptDimensions = false;
         }
     }
+    //#endregion
 
+    //#region theme
     private _theme: string;
     get theme(): string {
         if (this._theme) {
@@ -160,6 +170,7 @@ class SelectionsController implements ng.IController {
             this._theme = value;
         }
     }
+    //#endregion
 
     //#region model
     private _model: EngineAPI.IGenericObject;
@@ -169,21 +180,22 @@ class SelectionsController implements ng.IController {
     set model(value: EngineAPI.IGenericObject) {
         if (value !== this._model) {
             try {
-                logger.debug("val", value);
+                logger.info("val", value);
                 this._model = value;
                 let that = this;
+                logger.info("data", value);
                 this.model.on("changed", function () {
 
-                    // this.getProperties().then((res: EngineAPI.IGenericObjectProperties) => {
-                    //     logger.info("res", res);
-                    // });
+                    this.getProperties().then((res: EngineAPI.IGenericObjectProperties) => {
+                        logger.info("res", res);
+                    });
 
                     this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
 
                         that.checkAvailabilityOfMenuListElementsDimension();
                         that.getProperties(res.properties);
 
-                        if (!that.dimensionList) {
+                        if (!that.dimensionList.obj || !that.dimensionList) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
                             that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length, "dimension");
@@ -541,6 +553,15 @@ class SelectionsController implements ng.IController {
             hasSeparator: false,
             type: "menu"
         });
+        this.menuListValues.push({
+            buttonType: "",
+            isVisible: true,
+            isEnabled: false,
+            icon: "debug",
+            name: "Scramble Values",
+            hasSeparator: false,
+            type: "menu"
+        });
     }
 
     /**
@@ -590,6 +611,9 @@ class SelectionsController implements ng.IController {
             case "Lock all dimension":
                 this.lockMenuListValues = true;
                 (this.model.app.lockAll as any)();
+                break;
+            case "Scramble Values":
+                (this.model.app as any).scramble(this.selectedDimension);
                 break;
 
         }

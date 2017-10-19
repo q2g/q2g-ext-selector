@@ -15,7 +15,6 @@ import { TranslateProvider, ITranslateProvider, TranslateService, ITranslateServ
 import { RegistrationProvider, IRegistrationProvider } from "./lib/daVinci.js/src/services/registration";
 //#endregion
 
-
 qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
     .translations("en", langEN)
     .translations("de", langDE)
@@ -207,7 +206,7 @@ export = {
     },
     controller: ["$scope", function (
         scope: IVMScope<SelectionExtension>) {
-        logger.debug("Initialice Extension");
+        logger.debug("Initialice Extension", scope);
         scope.vm = new SelectionExtension(getEnigma(scope));
     }]
 };
