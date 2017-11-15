@@ -1,4 +1,6 @@
 # Selector Extension
+[![Greenkeeper badge](https://badges.greenkeeper.io/q2g/q2g-ext-selector.svg)](https://greenkeeper.io/)
+[![TravisCI](https://travis-ci.org/q2g/q2g-ext-selector.svg?branch=master)](https://travis-ci.org/q2g/q2g-ext-selector)
 
 This extensions developed for blind users to make selections with full
 keyboard control and full [JAWS](http://www.freedomscientific.com/Products/Blindness/JAWS) support.
