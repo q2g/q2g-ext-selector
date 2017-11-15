@@ -1,8 +1,6 @@
 {
     // The following will hide the js and map files in the editor
-    "files.exclude": {       
-        // "**/*.js": true,
-         "src/lib/daVinci.js":false,
+    "files.exclude": {
         "**/*.map": true,
         "**/*.css": true
     }

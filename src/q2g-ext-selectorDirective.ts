@@ -56,7 +56,8 @@ class SelectionsController implements ng.IController {
     actionDelay: number = 0;
     dimensionList: Q2gListAdapter;
     editMode: boolean = false;
-    element: JQuery;properties: IShortcutProperties = {
+    element: JQuery;
+    properties: IShortcutProperties = {
         shortcutFocusDimensionList: " ",
         shortcutFocusSearchField: " ",
         shortcutFocusValueList: " ",
@@ -197,6 +198,7 @@ class SelectionsController implements ng.IController {
 
                         if (!that.dimensionList.obj || !that.dimensionList) {
                             let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
+
                             that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length, "dimension");
                         } else {
