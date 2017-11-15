@@ -1,43 +1,39 @@
-﻿/// <reference path="lib/daVinci.js/src/utils/utils.ts" />
-
-//#region Imports
-import "css!./q2g-ext-selector.css";
+﻿//#region Imports
+import "css!./q2g-ext-selectorExtension.css";
 import * as qvangular from "qvangular";
 import * as qlik from "qlik";
-import * as template from "text!./q2g-ext-selector.html";
+import * as template from "text!./q2g-ext-selectorExtension.html";
 import * as langDE from "text!./translate/de-DE/propertypanel.js";
 import * as langEN from "text!./translate/en-US/propertypanel.js";
 
-import { Logging } from "./lib/daVinci.js/src/utils/logger";
+import { utils, logging, services, version } from "../node_modules/davinci.js/dist/daVinci";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";
-import { getEnigma, checkDirectiveIsRegistrated } from "./lib/daVinci.js/src/utils/utils";
-import { TranslateProvider, ITranslateProvider, TranslateService, ITranslateService } from "./lib/daVinci.js/src/services/translate";
-import { RegistrationProvider, IRegistrationProvider } from "./lib/daVinci.js/src/services/registration";
 //#endregion
 
-
-qvangular.service<ITranslateProvider>("$translateProvider", TranslateProvider)
+//#region registrate services
+qvangular.service<services.ITranslateProvider>("$translateProvider", services.TranslateProvider)
     .translations("en", langEN)
     .translations("de", langDE)
     .determinePreferredLanguage();
 
-let $translate = qvangular.service<ITranslateService>("$translate", TranslateService);
+let $translate = qvangular.service<services.ITranslateService>("$translate", services.TranslateService);
 
-qvangular.service<IRegistrationProvider>("$registrationProvider", RegistrationProvider)
-    .implementObject(qvangular);
-
-//#region Logger
-Logging.LogConfig.SetLogLevel("*", Logging.LogLevel.info);
-let logger = new Logging.Logger("Main");
+qvangular.service<services.IRegistrationProvider>("$registrationProvider", services.RegistrationProvider)
+.implementObject(qvangular);
 //#endregion
 
-//#region Directives
+//#region Logger
+logging.LogConfig.SetLogLevel("*", logging.LogLevel.info);
+let logger = new logging.Logger("Main");
+//#endregion
+
+//#region registrate directives
 var $injector = qvangular.$injector;
-checkDirectiveIsRegistrated($injector, qvangular, "", SelectionsDirectiveFactory("Selectionextension"),
+utils.checkDirectiveIsRegistrated($injector, qvangular, "", SelectionsDirectiveFactory("Selectionextension"),
     "SelectionExtension");
 //#endregion
 
-//#region assist classes
+//#region set extension parameters
 let parameter = {
     type: "items",
     component: "accordion",
@@ -51,7 +47,7 @@ let parameter = {
             items: {
                 accessibility: {
                     type: "items",
-                    label: $translate.instant("properties.accessibility"),
+                    label: "Accessibility",
                     grouped: true,
                     items: {
                         shortcuts: {
@@ -178,15 +174,13 @@ let parameter = {
 };
 //#endregion
 
-
 class SelectionExtension {
-    constructor(model: EngineAPI.IGenericObject) {
-        logger.debug("Constructor of Selection Extension", "");
-
-        this.model = model;
-    }
 
     model: EngineAPI.IGenericObject;
+
+    constructor(model: EngineAPI.IGenericObject) {
+        this.model = model;
+    }
 
     public isEditMode() {
         if (qlik.navigation.getMode() === "analysis") {
@@ -195,7 +189,6 @@ class SelectionExtension {
             return true;
         }
     }
-
 }
 
 export = {
@@ -205,11 +198,12 @@ export = {
     support : {
         export: true
     },
-    controller: ["$scope", function (
-        scope: IVMScope<SelectionExtension>) {
-        logger.debug("Initialice Extension");
-        scope.vm = new SelectionExtension(getEnigma(scope));
+    controller: ["$scope", function (scope: utils.IVMScope<SelectionExtension>) {
+        console.log("Extension is using daVinci.js Verions: " + version);
+        scope.vm = new SelectionExtension(utils.getEnigma(scope));
     }]
 };
+
+
 
 
