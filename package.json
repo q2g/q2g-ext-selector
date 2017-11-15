@@ -15,7 +15,7 @@
     "@types/qlik-visualizationextensions": "3.2.3"
   },
   "dependencies": {
-    "davinci.js": "^1.0.1"
+    "davinci.js": "^1.0.2"
   },
   "scripts": {
     "comp": "tsc -p tsconfig.json"

@@ -1,7 +1,6 @@
 ﻿//#region interfaces
 import { utils, logging, directives } from "../node_modules/davinci.js/dist/daVinci";
 import * as template from "text!./q2g-ext-selectorDirective.html";
-import { IDataModelItem } from "../node_modules/davinci.js/dist/directives/listview";
 //#endregion
 
 //#region interfaces
@@ -24,9 +23,9 @@ class ListsInformation {
 }
 
 class DataModel {
-    dimensionList: Array<IDataModelItem> = [];
-    dimensionListBackup: Array<IDataModelItem> = [];
-    valueList: Array<IDataModelItem> = [];
+    dimensionList: Array<directives.IDataModelItem> = [];
+    dimensionListBackup: Array<directives.IDataModelItem> = [];
+    valueList: Array<directives.IDataModelItem> = [];
 }
 //#endregion
 
@@ -202,7 +201,7 @@ class SelectionsController implements ng.IController {
                                 new utils.Q2gIndObject(
                                     new utils.AssistHyperCubeDimensionsInd(res)),
                                 utils.calcNumbreOfVisRows(that.elementHeight),
-                                (res as any).qHyperCube.qDimensionInfo.length);
+                                res.qHyperCube.qDimensionInfo.length);
                         }
                     })
                     .catch((error) => {
@@ -614,7 +613,7 @@ class SelectionsController implements ng.IController {
                 (this.model.app.lockAll as any)();
                 break;
             case "Scramble Values":
-                (this.model.app as any).scramble(this.selectedDimension);
+            (this.model.app as any).scramble(this.selectedDimension);
                 break;
 
         }
