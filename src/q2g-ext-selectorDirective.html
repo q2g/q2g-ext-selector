@@ -5,34 +5,37 @@
          q2g-shortcut-scope="rootelement">
             <table q2g-shortcut
                    shortcut="[{name:'clearselection', shortcut:vm.properties.shortcutClearSelection}]"
-                   shortcut-action="vm.shortcutHandler(objectShortcut)"
+                   shortcut-action="vm.shortcutHandler(shortcutObject, domcontainer)"
                    class="rootTable">
                 <tr>
                     <td q2g-shortcut-scope
                         class="doublePage dimensionList"
                         q2g-shortcut
                         shortcut="[{name:'escDimension', shortcut:'27'}]"
-                        shortcut-action="vm.shortcutHandler(objectShortcut)">
+                        shortcut-action="vm.shortcutHandler(shortcutObject, domcontainer)">
                         <div>
-                            <q2g-extension-header menu-list="vm.menuListDimension"
-                                                  max-number-of-elements="4"
+                            <q2g-extension-header max-number-of-elements="4"
                                                   reserved-button-width="0.5"
-                                                  text-search="vm.textSearchDimension"
-                                                  shortcut-searchfield="'strg + alt + 83'"
-                                                  show-buttons="vm.showButtonsDimension"
-                                                  show-search-field="vm.showSearchFieldDimension"
                                                   title="vm.titleDimension"
-                                                  callback-main-menu-button="vm.menuListActionCallback(item)"
                                                   theme="vm.theme"
+
                                                   input-accept="vm.inputAcceptDimensions"
-                                                  input-cancel="vm.inputCancelDimensions">
+                                                  input-cancel="vm.inputCancelDimensions"
+                                                  input-field="vm.textSearchDimension"
+                                                  input-bar-visible="vm.showSearchFieldDimension"
+
+                                                  menu-visible="vm.showButtonsDimension"
+                                                  menu-callback="vm.menuListActionCallback(item)"
+                                                  menu-list="vm.menuListDimension"
+                                                  
+                                                  shortcut-searchfield="'strg + alt + 83'">
                             </q2g-extension-header>
                         </div>
                         <div style="position:relative"
                              q2g-shortcut
                              shortcut="[
                             {name:'focusDimensionList', shortcut:vm.properties.shortcutFocusDimensionList, rootscope: '|global|'}]"
-                             shortcut-action="vm.shortcutHandler(objectShortcut)"
+                             shortcut-action="vm.shortcutHandler(shortcutObject, domcontainer)"
                              keycode-override="[]">
                             <q2g-listview style="height: calc(100% - 90px);"
                                           tabindex="0"
@@ -53,19 +56,22 @@
                         class="doublePage valueList"
                         q2g-shortcut
                         shortcut="[{name:'escValues', shortcut:'27'}]"
-                        shortcut-action="vm.shortcutHandler(objectShortcut)">
-                        <q2g-extension-header menu-list="vm.menuListValues"
-                                              max-number-of-elements="4"
+                        shortcut-action="vm.shortcutHandler(shortcutObject, domcontainer)">
+                        <q2g-extension-header max-number-of-elements="4"
                                               reserved-button-width="0.5"
-                                              text-search="vm.textSearchValue"
-                                              shortcut-searchfield="'strg + alt + 83'"
-                                              show-buttons="vm.showButtonsValue"
-                                              show-search-field="vm.showSearchFieldValues"
                                               title="vm.titleValues"
-                                              callback-main-menu-button="vm.menuListActionCallback(item)"
                                               theme="vm.theme"
+
                                               input-accept="vm.inputAcceptValues"
                                               input-cancel="vm.inputCancelValues"
+                                              input-field="vm.textSearchValue"
+                                              input-bar-visible="vm.showSearchFieldValues"
+
+                                              menu-visible="vm.showButtonsValue"
+                                              menu-callback="vm.menuListActionCallback(item)"
+                                              menu-list="vm.menuListValues"
+
+                                              shortcut-searchfield="'strg + alt + 83'"
                                               is-locked="vm.lockMenuListValues">
 
                         </q2g-extension-header>
@@ -73,7 +79,7 @@
                              q2g-shortcut
                              shortcut="[
                              {name:'focusValueList', shortcut:vm.properties.shortcutFocusValueList, rootscope: '|global|'}]"
-                             shortcut-action="vm.shortcutHandler(objectShortcut)">
+                             shortcut-action="vm.shortcutHandler(shortcutObject, domcontainer)">
                             <!--<q2g-listview style="height: calc(100% - 90px);"
                                           tabindex="0"
                                           items="vm.valueList.collection"

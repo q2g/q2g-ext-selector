@@ -1,40 +1,23 @@
-﻿
-import { Logging } from "./lib/daVinci.js/src/utils/logger";
-import { ListViewDirectiveFactory, IDataModelItem } from "./lib/daVinci.js/src/directives/listview";
-import { ScrollBarDirectiveFactory } from "./lib/daVinci.js/src/directives/scrollBar";
-import { StatusTextDirectiveFactory } from "./lib/daVinci.js/src/directives/statusText";
-import { ExtensionHeaderDirectiveFactory } from "./lib/daVinci.js/src/directives/extensionHeader";
-import { ShortCutDirectiveFactory } from "./lib/daVinci.js/src/directives/shortcut";
-import { IdentifierDirectiveFactory } from "./lib/daVinci.js/src/directives/identifier";
-import { Q2gListAdapter, Q2gListObject, Q2gDimensionObject } from "./lib/daVinci.js/src/utils/object";
-
-import * as utils from "./lib/daVinci.js/src/utils/utils";
+﻿//#region interfaces
+import { utils, logging, directives } from "../node_modules/davinci.js/dist/daVinci";
 import * as template from "text!./q2g-ext-selectorDirective.html";
+import { IDataModelItem } from "../node_modules/davinci.js/dist/directives/listview";
+//#endregion
 
-let logger = new Logging.Logger("q2g-ext-selectorDrective");
-
+//#region interfaces
 interface IVMScope<T> extends ExtensionAPI.IExtensionScope {
     vm: T;
 }
 
-interface IShortcutProperties {
+export interface IShortcutProperties {
     shortcutFocusDimensionList: string;
     shortcutFocusSearchField: string;
     shortcutFocusValueList: string;
     shortcutClearSelection: string;
 }
+//#endregion
 
-interface IMenuElement {
-    buttonType: string;
-    isVisible: boolean;
-    isEnabled: boolean;
-    isChecked?: boolean;
-    icon: string;
-    type: "menu" | "submenu" | "checkbox";
-    name: string;
-    hasSeparator: boolean;
-}
-
+//#region assist classes
 class ListsInformation {
     maxNumberOfRows: number = 0;
     numberOfVisibleRows: number = 0;
@@ -45,16 +28,17 @@ class DataModel {
     dimensionListBackup: Array<IDataModelItem> = [];
     valueList: Array<IDataModelItem> = [];
 }
+//#endregion
 
 class SelectionsController implements ng.IController {
 
     $onInit(): void {
-        logger.debug("initial Run of SelectionsController");
+        this.logger.debug("initial Run of SelectionsController");
     }
 
     //#region Variables
     actionDelay: number = 0;
-    dimensionList: Q2gListAdapter;
+    dimensionList: utils.IQ2gListAdapter;
     editMode: boolean = false;
     element: JQuery;
     properties: IShortcutProperties = {
@@ -63,9 +47,9 @@ class SelectionsController implements ng.IController {
         shortcutFocusValueList: " ",
         shortcutClearSelection: " ",
     };
-    menuListDimension: Array<IMenuElement>;
-    menuListValues: Array<IMenuElement>;
-    selectedDimensioId: Array<number>;
+    menuListDimension: Array<utils.IMenuElement>;
+    menuListValues: Array<utils.IMenuElement>;
+    selectedDimensioId: Array<string>;
     statusText: string;
     showFocusedDimension: boolean = false;
     showFocusedValue: boolean = false;
@@ -76,11 +60,25 @@ class SelectionsController implements ng.IController {
     titleDimension: string = "Dimensions";
     titleValues: string = "no Dimension Selected";
     useReadebility: boolean = false;
-    valueList: Q2gListAdapter;
+    valueList: utils.IQ2gListAdapter;
 
     private engineGenericObjectVal: EngineAPI.IGenericObject;
     private selectedDimensionDefs: Array<string> = [];
     private selectedDimension: string = "";
+    //#endregion
+
+    //#region logger
+    private _logger: logging.Logger;
+    private get logger(): logging.Logger {
+        if (!this._logger) {
+            try {
+                this._logger = new logging.Logger("SelectionsController");
+            } catch (e) {
+                console.error("ERROR in create logger instance", e);
+            }
+        }
+        return this._logger;
+    }
     //#endregion
 
     //#region lockMenuListValues
@@ -93,7 +91,7 @@ class SelectionsController implements ng.IController {
             if (this._lockMenuListValues) {
                 (this.engineGenericObjectVal.unlock as any)("/qListObjectDef")
                     .catch((e) => {
-                        logger.error("Error in Setter of lockMenuListValues", e);
+                        this.logger.error("Error in Setter of lockMenuListValues", e);
                     });
             }
             this._lockMenuListValues = v;
@@ -115,10 +113,10 @@ class SelectionsController implements ng.IController {
                         this.showSearchFieldValues = false;
                         this.textSearchValue = "";
                     }).catch((error) => {
-                        logger.error("Error in setter of input Accept Dimension", error);
+                        this.logger.error("Error in setter of input Accept Dimension", error);
                     });
             } catch (error) {
-                logger.error("Error in setter of input Accept", error);
+                this.logger.error("Error in setter of input Accept", error);
                 this._inputAcceptValues = false;
             }
 
@@ -181,38 +179,39 @@ class SelectionsController implements ng.IController {
     set model(value: EngineAPI.IGenericObject) {
         if (value !== this._model) {
             try {
-                logger.info("val", value);
                 this._model = value;
                 let that = this;
-                logger.info("data", value);
                 this.model.on("changed", function () {
 
-                    this.getProperties().then((res: EngineAPI.IGenericObjectProperties) => {
-                        logger.info("res", res);
-                    });
-
-                    this.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
-
+                    this.getProperties()
+                    .then((res: EngineAPI.IGenericObjectProperties) => {
+                        return that.getProperties(res.properties);
+                    })
+                    .then(() => {
+                        return this.getLayout();
+                    })
+                    .then((res: EngineAPI.IGenericHyperCubeLayout) => {
                         that.checkAvailabilityOfMenuListElementsDimension();
-                        that.getProperties(res.properties);
-
                         if (!that.dimensionList.obj || !that.dimensionList) {
-                            let dimObject = new Q2gDimensionObject(new utils.AssistHypercube(res));
-
-                            that.dimensionList = new Q2gListAdapter(dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
+                            let dimObject = new utils.Q2gIndObject(new utils.AssistHyperCubeDimensionsInd(res));
+                            that.dimensionList = new utils.Q2gListAdapter(
+                                dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
                                 res.qHyperCube.qDimensionInfo.length, "dimension");
                         } else {
                             that.dimensionList.updateList(
-                                new Q2gDimensionObject(
-                                    new utils.AssistHypercube(res)),
+                                new utils.Q2gIndObject(
+                                    new utils.AssistHyperCubeDimensionsInd(res)),
                                 utils.calcNumbreOfVisRows(that.elementHeight),
-                                res.qHyperCube.qDimensionInfo.length);
+                                (res as any).qHyperCube.qDimensionInfo.length);
                         }
+                    })
+                    .catch((error) => {
+                        console.error("Error in on change of selector object", error);
                     });
                 });
                 this.model.emit("changed");
             } catch (e) {
-                logger.error("error", e);
+                this.logger.error("error", e);
             }
         }
     }
@@ -241,7 +240,7 @@ class SelectionsController implements ng.IController {
                     this.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
                 }
             } catch (err) {
-                logger.error("error in setter of elementHeight", err);
+                this.logger.error("error in setter of elementHeight", err);
             }
         }
     }
@@ -261,7 +260,7 @@ class SelectionsController implements ng.IController {
                         this._focusedPositionDimension = newVal;
                     })
                     .catch((e: Error) => {
-                        logger.error("ERROR in Setter of absolutPosition");
+                        this.logger.error("ERROR in Setter of absolutPosition");
                     });
                 return;
             }
@@ -288,7 +287,7 @@ class SelectionsController implements ng.IController {
                             this._focusedPositionValues = newVal;
                         })
                         .catch((e: Error) => {
-                            logger.error("ERROR in Setter of absolutPosition");
+                            this.logger.error("ERROR in Setter of absolutPosition");
                         });
                     return;
                 }
@@ -324,7 +323,7 @@ class SelectionsController implements ng.IController {
                 });
 
             } catch (err) {
-                logger.error("error in setter of textSearchValue", err);
+                this.logger.error("error in setter of textSearchValue", err);
             }
         }
     }
@@ -346,7 +345,7 @@ class SelectionsController implements ng.IController {
                     }).then((res: EngineAPI.IGenericObjectProperties) => {
                         this.valueList.itemsCounter = res.qListObject.qDimensionInfo.qCardinal;
                     }).catch((e: Error) => {
-                        logger.error("ERROR in Setter of textSearchValue", e);
+                        this.logger.error("ERROR in Setter of textSearchValue", e);
                     });
                     return;
                 }
@@ -359,10 +358,10 @@ class SelectionsController implements ng.IController {
                 }).then((res: EngineAPI.IGenericObjectProperties) => {
                     this.valueList.itemsCounter = res.qListObject.qDimensionInfo.qCardinal;
                 }).catch((e: Error) => {
-                    logger.error("ERROR in Setter of textSearchValue", e);
+                    this.logger.error("ERROR in Setter of textSearchValue", e);
                 });
             } catch (err) {
-                logger.error("error in setter of textSearchValue");
+                this.logger.error("error in setter of textSearchValue");
             }
         }
     }
@@ -427,7 +426,7 @@ class SelectionsController implements ng.IController {
                     this.timeout();
                 }
             } catch (e) {
-                logger.error("Error in Constructor with click event", e);
+                this.logger.error("Error in Constructor with click event", e);
             }
         });
 
@@ -626,7 +625,7 @@ class SelectionsController implements ng.IController {
      * @param pos position of the selected extension in the displayed list
      */
     selectDimensionObjectCallback(pos: number): void {
-        logger.debug("function selectDimensionObjectCallback", "");
+        this.logger.debug("function selectDimensionObjectCallback", "");
         try {
             if (this.selectedDimension !== this.dimensionList.collection[pos].title) {
                 setTimeout(() => {
@@ -656,7 +655,7 @@ class SelectionsController implements ng.IController {
 
             }
         } catch (err) {
-            logger.error("ERROR in selectDimension", err);
+            this.logger.error("ERROR in selectDimension", err);
         }
     }
 
@@ -671,13 +670,13 @@ class SelectionsController implements ng.IController {
             this.showButtonsValue = true;
 
             this.engineGenericObjectVal.selectListObjectValues(
-                "/qListObjectDef", this.valueList.collection[pos].id, (event && event.ctrlKey) ? false : true)
+                "/qListObjectDef", (this.valueList.collection[pos].id as any), (event && event.ctrlKey) ? false : true)
                 .then(() => {
                     this.focusedPositionValues = pos + this.valueList.itemsPagingTop;
                     this.valueList.itemsPagingTop = assistItemsPagingTop;
                     this.statusText = "Dimension " + this.valueList.collection[pos].title + " gewählt";
                 }).catch((err: Error) => {
-                    logger.error("ERROR in selectListObjectCallback", err);
+                    this.logger.error("ERROR in selectListObjectCallback", err);
                 });
         }, this.actionDelay);
     }
@@ -693,7 +692,7 @@ class SelectionsController implements ng.IController {
                     this.createValueListSessionObjectAssist(dimensionName, dimensionFieldDefs);
                 })
                 .catch((err: Error) => {
-                    logger.error("Error in createValueListSessionObjcet", err);
+                    this.logger.error("Error in createValueListSessionObjcet", err);
                 });
         } else {
             this.createValueListSessionObjectAssist(dimensionName, dimensionFieldDefs);
@@ -747,8 +746,8 @@ class SelectionsController implements ng.IController {
                 this.engineGenericObjectVal = genericObject;
 
                 genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
-                    this.valueList = new Q2gListAdapter(
-                        new Q2gListObject(
+                    this.valueList = new utils.Q2gListAdapter(
+                        new utils.Q2gListObject(
                             genericObject),
                         utils.calcNumbreOfVisRows(this.elementHeight),
                         res.qListObject.qDimensionInfo.qCardinal,
@@ -767,7 +766,7 @@ class SelectionsController implements ng.IController {
                 });
             })
             .catch((err: Error) => {
-                logger.error("ERROR", err);
+                this.logger.error("ERROR", err);
             });
     }
 
@@ -777,7 +776,7 @@ class SelectionsController implements ng.IController {
      * @param focusedPosition the old value of the focusedPosition
      * @param object the list object, in which the changes shoud be done
      */
-    private calcPagingStart(newVal: number, focusedPosition: number, object: Q2gListAdapter): number {
+    private calcPagingStart(newVal: number, focusedPosition: number, object: utils.IQ2gListAdapter): number {
 
         // absolutPosition out of sight below
         if (focusedPosition < object.itemsPagingTop && focusedPosition >= 0) {
@@ -806,10 +805,9 @@ class SelectionsController implements ng.IController {
      * shortcuthandler to clears the made selection
      * @param objectShortcut object wich gives you the shortcut name and the element, from which the shortcut come from
      */
-    shortcutHandler(objectShortcut: any): boolean {
-        logger.debug("function shortcutHandler", objectShortcut.objectShortcut.name);
+    shortcutHandler(shortcutObject: directives.IShortcutObject, domcontainer: utils.IDomContainer): boolean {
 
-        switch (objectShortcut.objectShortcut.name) {
+        switch (shortcutObject.name) {
 
             case "focusDimensionList":
                 try {
@@ -818,14 +816,14 @@ class SelectionsController implements ng.IController {
                     this.timeout();
                     if (this.focusedPositionDimension < 0) {
                         this.focusedPositionDimension = 0;
-                        objectShortcut.element.children().children().children()[0].focus();
+                        domcontainer.element.children().children().children()[0].focus();
                         this.timeout();
                         return true;
                     }
 
                     if (this.focusedPositionDimension >= this.dimensionList.collection.length) {
                         this.focusedPositionDimension = 0;
-                        objectShortcut.element.children().children().children()[0].focus();
+                        domcontainer.element.children().children().children()[0].focus();
                         this.timeout();
                         return true;
                     }
@@ -839,12 +837,12 @@ class SelectionsController implements ng.IController {
 
                     }
 
-                    objectShortcut.element.children().children().children().children()[
+                    domcontainer.element.children().children().children().children()[
                         this.focusedPositionDimension - this.dimensionList.itemsPagingTop
                     ].focus();
                     return true;
                 } catch (e) {
-                    logger.error("Error in shortcut Handler", e);
+                    this.logger.error("Error in shortcut Handler", e);
                     return false;
                 }
 
@@ -852,10 +850,10 @@ class SelectionsController implements ng.IController {
                 try {
                     this.showFocusedDimension = false;
                     this.timeout();
-                    objectShortcut.element.focus();
+                    domcontainer.element.focus();
                     return true;
                 } catch (e) {
-                    logger.error("Error in shortcut Handler", e);
+                    this.logger.error("Error in shortcut Handler", e);
                     return false;
                 }
 
@@ -865,13 +863,13 @@ class SelectionsController implements ng.IController {
                 this.model.app.clearAll(true).then(() => {
                     this.statusText = "Selektionen wurden gelöscht";
                 }).catch((e: Error) => {
-                    logger.error("error in shortcutHandlerClear", e);
+                    this.logger.error("error in shortcutHandlerClear", e);
                     });
                 return true;
 
             case "focusSearchValue":
                 this.showFocusedValue = false;
-                objectShortcut.element.focus();
+                domcontainer.element.focus();
                 return true;
 
             case "focusValueList":
@@ -884,7 +882,7 @@ class SelectionsController implements ng.IController {
                         this.focusedPositionValues >= utils.calcNumbreOfVisRows(this.elementHeight) + this.valueList.itemsPagingTop) {
                         this.focusedPositionValues = 0;
                         this.valueList.itemsPagingTop = 0;
-                        objectShortcut.element.children().children().children().children()[0].focus();
+                        domcontainer.element.children().children().children().children()[0].focus();
                         this.timeout();
                         return true;
                     }
@@ -894,7 +892,7 @@ class SelectionsController implements ng.IController {
                     } else if (this.focusedPositionValues > this.valueList.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
                         this.valueList.itemsPagingTop = this.focusedPositionValues - (utils.calcNumbreOfVisRows(this.elementHeight) + 1);
                     }
-                    objectShortcut.element.children().children().children().children()[
+                    domcontainer.element.children().children().children().children()[
                         this.focusedPositionValues - this.valueList.itemsPagingTop
                     ].focus();
                 }
@@ -902,8 +900,8 @@ class SelectionsController implements ng.IController {
 
             case "escape":
                 if (this.textSearchDimension.length > 0 || this.textSearchValue.length > 0) {
-                    if (objectShortcut.element.parent().find(":focus").length > 0) {
-                        switch (objectShortcut.element[0].getAttribute("ng-model")) {
+                    if (domcontainer.element.parent().find(":focus").length > 0) {
+                        switch (domcontainer.element[0].getAttribute("ng-model")) {
                             case "vm.textSearchDimension":
                                 this.textSearchDimension = "";
                                 break;
@@ -912,7 +910,7 @@ class SelectionsController implements ng.IController {
                                 break;
                         }
                     } else {
-                        objectShortcut.element.blur();
+                        domcontainer.element.blur();
                     }
                 }
                 return true;
@@ -923,7 +921,7 @@ class SelectionsController implements ng.IController {
                         .then(() => {
                             this.statusText = "Alle gesuchten Werte gewählt";
                         }).catch((err: Error) => {
-                            logger.error("ERROR in selectListObjectCallback", err);
+                            this.logger.error("ERROR in selectListObjectCallback", err);
                         });
                 }, this.actionDelay);
                 return true;
@@ -935,7 +933,7 @@ class SelectionsController implements ng.IController {
                     }
                     return true;
                 } catch (e) {
-                    logger.error("Error in shortcutHandlerExtensionHeader", e);
+                    this.logger.error("Error in shortcutHandlerExtensionHeader", e);
                     return false;
                 }
 
@@ -946,7 +944,7 @@ class SelectionsController implements ng.IController {
                     }
                     return true;
                 } catch (e) {
-                    logger.error("Error in shortcutHandlerExtensionHeader", e);
+                    this.logger.error("Error in shortcutHandlerExtensionHeader", e);
                     return false;
                 }
         }
@@ -979,6 +977,7 @@ class SelectionsController implements ng.IController {
                 this.actionDelay = parseInt(properties.aria.actionDelay, 10);
             }
             this.useReadebility = properties.aria.useAccessibility;
+            resolve();
         });
     }
 
@@ -1039,20 +1038,19 @@ export function SelectionsDirectiveFactory(rootNameSpace: string): ng.IDirective
                 editMode: "<?"
             },
             compile: ():void => {
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ListViewDirectiveFactory(rootNameSpace),
-                    "Listview");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ScrollBarDirectiveFactory(rootNameSpace),
-                    "ScrollBar");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
-                    StatusTextDirectiveFactory(rootNameSpace),"StatusText");
-                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace, ShortCutDirectiveFactory(rootNameSpace),
-                    "Shortcut");
+                    directives.ListViewDirectiveFactory(rootNameSpace), "Listview");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
-                    IdentifierDirectiveFactory(rootNameSpace), "AkquinetIdentifier");
+                    directives.StatusTextDirectiveFactory(rootNameSpace),"StatusText");
                 utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
-                    ExtensionHeaderDirectiveFactory(rootNameSpace), "ExtensionHeader");
+                    directives.ShortCutDirectiveFactory(rootNameSpace), "Shortcut");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    directives.IdentifierDirectiveFactory(rootNameSpace), "AkquinetIdentifier");
+                utils.checkDirectiveIsRegistrated($injector, $registrationProvider, rootNameSpace,
+                    directives.ExtensionHeaderDirectiveFactory(rootNameSpace), "ExtensionHeader");
             }
         };
     };
 }
+
 
