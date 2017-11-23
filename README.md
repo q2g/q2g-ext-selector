@@ -13,9 +13,7 @@ keyboard control and full [JAWS](http://www.freedomscientific.com/Products/Blind
 
 ### binary
 
-NOT working at the moment
-
-1. Got to Qlik Market and [Download the ZIP](http://market.qlik.com/solutions/akquinet_extension_package)
+1. [Download the ZIP](https://m.sense2go.net/extension-package) and unzip
 2. Qlik Sense Desktop
    Copy it to: %homeptah%\Documents\Qlik\Sense\Extensions and unzip
 3. Qlik Sense Entripse
@@ -23,6 +21,8 @@ NOT working at the moment
 
 ### source
 
-1. Clone the Github Repo
-2. Open the .sln in Visual Studio
-3. Compile
+1. Clone the Github Repo into extension directory
+2. Install [nodejs](https://nodejs.org/)
+3. Open Node.js command prompt
+4. npm install
+5. npm run build
