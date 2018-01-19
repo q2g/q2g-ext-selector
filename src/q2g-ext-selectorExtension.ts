@@ -195,8 +195,16 @@ export = {
     definition: parameter,
     initialProperties: { },
     template: template,
-    support : {
-        export: true
+    support: {
+        snapshot: false,
+        export: true,
+        exportData: false
+    },
+    paint: () => {
+        //
+    },
+    resize: () => {
+        //
     },
     controller: ["$scope", function (scope: utils.IVMScope<SelectionExtension>) {
         console.log("Extension is using daVinci.js Verions: " + version);
