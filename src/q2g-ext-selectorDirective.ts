@@ -650,6 +650,9 @@ class SelectionsController implements ng.IController {
      * @param pos position from the selected Value
      */
     selectListObjectCallback(pos: number, event?: JQueryKeyEventObject): void {
+        if (typeof(event) === "undefined") {
+            return;
+        }
         let assistItemsPagingTop = this.valueList.itemsPagingTop;
         setTimeout(() => {
             this.showFocusedValue = true;
@@ -934,6 +937,7 @@ class SelectionsController implements ng.IController {
                     return false;
                 }
         }
+
         return false;
     }
 
