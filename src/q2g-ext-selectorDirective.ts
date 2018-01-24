@@ -1,6 +1,8 @@
 ﻿//#region interfaces
-import { utils, logging, directives } from "../node_modules/davinci.js/dist/umd/daVinci";
-import * as template from "text!./q2g-ext-selectorDirective.html";
+import { logging,
+         utils,
+         directives }           from "../node_modules/davinci.js/dist/umd/daVinci";
+import * as template            from "text!./q2g-ext-selectorDirective.html";
 //#endregion
 
 //#region interfaces
@@ -181,31 +183,30 @@ class SelectionsController implements ng.IController {
                 this._model = value;
                 let that = this;
                 value.on("changed", function () {
+                    let properties: EngineAPI.IGenericHyperCubeProperties;
+
+
                     this.getProperties()
-                    .then((res: EngineAPI.IGenericObjectProperties) => {
-                        return that.getProperties(res.properties);
-                    })
-                    .then(() => {
-                        return this.getLayout();
-                    })
-                    .then((res: EngineAPI.IGenericHyperCubeLayout) => {
-                        that.checkAvailabilityOfMenuListElementsDimension();
-                        if (!that.dimensionList.obj || !that.dimensionList) {
-                            let dimObject = new utils.Q2gIndObject(new utils.AssistHyperCubeDimensionsInd(res));
-                            that.dimensionList = new utils.Q2gListAdapter(
-                                dimObject, that.dimensionList.itemsPagingHeight,
-                                res.qHyperCube.qDimensionInfo.length, "dimension");
-                        } else {
-                            that.dimensionList.updateList(
-                                new utils.Q2gIndObject(
-                                    new utils.AssistHyperCubeDimensionsInd(res)),
-                                    that.dimensionList.itemsPagingHeight,
-                                res.qHyperCube.qDimensionInfo.length);
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error in on change of selector object", error);
-                    });
+                        .then((res: EngineAPI.IGenericHyperCubeProperties) => {
+                            properties = res;
+                            return that.getProperties(res.properties);
+                        })
+                        .then(() => {
+                            if (properties.qHyperCubeDef.qDimensions.length === 0) {
+                                that.buildFieldList(this)
+                                    .catch((error) => {
+                                        Promise.reject(error);
+                                    });
+                            } else {
+                                that.buildDimensionList(this)
+                                    .catch((error) => {
+                                        Promise.reject(error);
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error in on change of selector object", error);
+                        });
                 });
                 this.model.emit("changed");
             } catch (e) {
@@ -395,7 +396,7 @@ class SelectionsController implements ng.IController {
 
         this.initMenuElements();
 
-        $(document).on("click", (e: JQueryEventObject) => {
+        $(document).on("click" as any, (e: JQueryEventObject) => {
             try {
                 if (element.children().children().children().children(".dimensionList").find(e.target).length === 0) {
                     this.showFocusedDimension = false;
@@ -610,7 +611,7 @@ class SelectionsController implements ng.IController {
      * @param pos position of the selected extension in the displayed list
      */
     selectDimensionObjectCallback(pos: number): void {
-        this.logger.debug("function selectDimensionObjectCallback", "");
+        this.logger.debug("function selectDimensionObjectCallback", " ");
         try {
             if (this.selectedDimension !== this.dimensionList.collection[pos].title) {
                 setTimeout(() => {
@@ -1004,6 +1005,79 @@ class SelectionsController implements ng.IController {
 
     private checkIfDimIsLocked(obj: EngineAPI.INxStateCounts) {
         this.lockMenuListValues = obj.qLocked > 0 || obj.qLockedExcluded > 0 ? true : false;
+    }
+
+    private buildDimensionList(object: EngineAPI.IGenericObject): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            object.getLayout()
+            .then((res: EngineAPI.IGenericHyperCubeLayout) => {
+                this.checkAvailabilityOfMenuListElementsDimension();
+                if (!this.dimensionList.obj || !this.dimensionList) {
+                    let dimObject = new utils.Q2gIndObject(new utils. AssistHyperCubeDimensionsInd(res));
+                    this.dimensionList = new utils.Q2gListAdapter(
+                        dimObject, this.dimensionList.itemsPagingHeight,
+                        res.qHyperCube.qDimensionInfo.length, "dimension");
+                } else {
+                    this.dimensionList.updateList(
+                        new utils.Q2gIndObject(
+                            new utils.AssistHyperCubeDimensionsInd(res)),
+                            this.dimensionList.itemsPagingHeight,
+                        res.qHyperCube.qDimensionInfo.length);
+                }
+                resolve(true);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+        });
+    }
+
+    private buildListProperties(): EngineAPI.IGenericObjectProperties {
+        let returnProperties: EngineAPI.IGenericObjectProperties = {
+            "qInfo": { "qType": "FieldList" },
+            "qFieldListDef": {
+                "qShowSystem": true,
+                "qShowHidden": true,
+                "qShowSemantic": true,
+                "qShowSrcTables": true,
+                "qShowDefinitionOnly": true,
+                "qShowDerivedFields": true,
+                "qShowImplicit": true
+            }
+        };
+        return returnProperties;
+    }
+
+    private buildFieldList(object: EngineAPI.IGenericObject): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+
+            object.app.createSessionObject(this.buildListProperties())
+                .then((sessionObject) => {
+                    return sessionObject.getLayout();
+                })
+                .then((res: any) => {
+                    this.checkAvailabilityOfMenuListElementsDimension();
+                    if (!this.dimensionList.obj || !this.dimensionList) {
+                        let dimObject = new utils.Q2gIndObject(new utils. AssistHyperCubeFields(res));
+                        this.dimensionList = new utils.Q2gListAdapter(
+                            dimObject, this.dimensionList.itemsPagingHeight,
+                            (res as any).qFieldList.qItems.length, "dimension");
+                    } else {
+                        this.dimensionList.updateList(
+                            new utils.Q2gIndObject(
+                                new utils.AssistHyperCubeFields(res)),
+                                this.dimensionList.itemsPagingHeight,
+                                (res as any).qFieldList.qItems.length);
+                    }
+
+
+
+                    resolve(true);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
     }
 }
 
