@@ -6,7 +6,7 @@ import * as template from "text!./q2g-ext-selectorExtension.html";
 import * as langDE from "text!./translate/de-DE/propertypanel.js";
 import * as langEN from "text!./translate/en-US/propertypanel.js";
 
-import { utils, logging, services, version } from "../node_modules/davinci.js/dist/daVinci";
+import { utils, logging, services, version } from "../node_modules/davinci.js/dist/umd/daVinci";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";
 //#endregion
 
@@ -195,8 +195,16 @@ export = {
     definition: parameter,
     initialProperties: { },
     template: template,
-    support : {
-        export: true
+    support: {
+        snapshot: false,
+        export: true,
+        exportData: false
+    },
+    paint: () => {
+        //
+    },
+    resize: () => {
+        //
     },
     controller: ["$scope", function (scope: utils.IVMScope<SelectionExtension>) {
         console.log("Extension is using daVinci.js Verions: " + version);

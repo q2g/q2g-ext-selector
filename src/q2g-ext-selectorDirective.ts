@@ -1,7 +1,8 @@
 ﻿//#region interfaces
-import { utils, logging, directives } from "../node_modules/davinci.js/dist/daVinci";
-import * as template from "text!./q2g-ext-selectorDirective.html";
-import { IDataModelItem } from "../node_modules/davinci.js/dist/directives/listview";
+import { logging,
+         utils,
+         directives }           from "../node_modules/davinci.js/dist/umd/daVinci";
+import * as template            from "text!./q2g-ext-selectorDirective.html";
 //#endregion
 
 //#region interfaces
@@ -24,9 +25,9 @@ class ListsInformation {
 }
 
 class DataModel {
-    dimensionList: Array<IDataModelItem> = [];
-    dimensionListBackup: Array<IDataModelItem> = [];
-    valueList: Array<IDataModelItem> = [];
+    dimensionList: Array<directives.IDataModelItem> = [];
+    dimensionListBackup: Array<directives.IDataModelItem> = [];
+    valueList: Array<directives.IDataModelItem> = [];
 }
 //#endregion
 
@@ -181,33 +182,31 @@ class SelectionsController implements ng.IController {
             try {
                 this._model = value;
                 let that = this;
-                this.model.on("changed", function () {
+                value.on("changed", function () {
+                    let properties: EngineAPI.IGenericHyperCubeProperties;
+
 
                     this.getProperties()
-                    .then((res: EngineAPI.IGenericObjectProperties) => {
-                        return that.getProperties(res.properties);
-                    })
-                    .then(() => {
-                        return this.getLayout();
-                    })
-                    .then((res: EngineAPI.IGenericHyperCubeLayout) => {
-                        that.checkAvailabilityOfMenuListElementsDimension();
-                        if (!that.dimensionList.obj || !that.dimensionList) {
-                            let dimObject = new utils.Q2gIndObject(new utils.AssistHyperCubeDimensionsInd(res));
-                            that.dimensionList = new utils.Q2gListAdapter(
-                                dimObject, utils.calcNumbreOfVisRows(that.elementHeight),
-                                res.qHyperCube.qDimensionInfo.length, "dimension");
-                        } else {
-                            that.dimensionList.updateList(
-                                new utils.Q2gIndObject(
-                                    new utils.AssistHyperCubeDimensionsInd(res)),
-                                utils.calcNumbreOfVisRows(that.elementHeight),
-                                (res as any).qHyperCube.qDimensionInfo.length);
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Error in on change of selector object", error);
-                    });
+                        .then((res: EngineAPI.IGenericHyperCubeProperties) => {
+                            properties = res;
+                            return that.getProperties(res.properties);
+                        })
+                        .then(() => {
+                            if (properties.qHyperCubeDef.qDimensions.length === 0) {
+                                that.buildFieldList(this)
+                                    .catch((error) => {
+                                        Promise.reject(error);
+                                    });
+                            } else {
+                                that.buildDimensionList(this)
+                                    .catch((error) => {
+                                        Promise.reject(error);
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error in on change of selector object", error);
+                        });
                 });
                 this.model.emit("changed");
             } catch (e) {
@@ -226,19 +225,6 @@ class SelectionsController implements ng.IController {
         if (this.elementHeight !== value) {
             try {
                 this._elementHeight = value;
-
-                if (this.dimensionList) {
-                    this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
-                    this.selectDimensionObjectCallback(0);
-                } else {
-                    this.timeout(() => {
-                        this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
-                        this.selectDimensionObjectCallback(0);
-                    }, 200);
-                }
-                if (this.valueList && this.valueList.obj) {
-                    this.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
-                }
             } catch (err) {
                 this.logger.error("error in setter of elementHeight", err);
             }
@@ -308,7 +294,7 @@ class SelectionsController implements ng.IController {
                 this._textSearchDimension = value;
                 if (!value) {
                     this.dimensionList.obj.searchFor("").then(() => {
-                        this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
+                        this.dimensionList.obj.emit("changed", this.dimensionList.itemsPagingHeight);
                         this.dimensionList.itemsCounter = (this.dimensionList.obj as any).model.calcCube.length;
                         this.timeout();
                     });
@@ -317,7 +303,7 @@ class SelectionsController implements ng.IController {
 
                 this.dimensionList.itemsPagingTop = 0;
                 this.dimensionList.obj.searchFor(value).then(() => {
-                    this.dimensionList.obj.emit("changed", utils.calcNumbreOfVisRows(this.elementHeight));
+                    this.dimensionList.obj.emit("changed", this.dimensionList.itemsPagingHeight);
                     this.dimensionList.itemsCounter = (this.dimensionList.obj as any).model.calcCube.length;
                     this.timeout();
                 });
@@ -410,7 +396,7 @@ class SelectionsController implements ng.IController {
 
         this.initMenuElements();
 
-        $(document).on("click", (e: JQueryEventObject) => {
+        $(document).on("click" as any, (e: JQueryEventObject) => {
             try {
                 if (element.children().children().children().children(".dimensionList").find(e.target).length === 0) {
                     this.showFocusedDimension = false;
@@ -614,7 +600,7 @@ class SelectionsController implements ng.IController {
                 (this.model.app.lockAll as any)();
                 break;
             case "Scramble Values":
-                (this.model.app as any).scramble(this.selectedDimension);
+            (this.model.app as any).scramble(this.selectedDimension);
                 break;
 
         }
@@ -625,7 +611,7 @@ class SelectionsController implements ng.IController {
      * @param pos position of the selected extension in the displayed list
      */
     selectDimensionObjectCallback(pos: number): void {
-        this.logger.debug("function selectDimensionObjectCallback", "");
+        this.logger.debug("function selectDimensionObjectCallback", " ");
         try {
             if (this.selectedDimension !== this.dimensionList.collection[pos].title) {
                 setTimeout(() => {
@@ -664,6 +650,9 @@ class SelectionsController implements ng.IController {
      * @param pos position from the selected Value
      */
     selectListObjectCallback(pos: number, event?: JQueryKeyEventObject): void {
+        if (typeof(event) === "undefined") {
+            return;
+        }
         let assistItemsPagingTop = this.valueList.itemsPagingTop;
         setTimeout(() => {
             this.showFocusedValue = true;
@@ -749,14 +738,14 @@ class SelectionsController implements ng.IController {
                     this.valueList = new utils.Q2gListAdapter(
                         new utils.Q2gListObject(
                             genericObject),
-                        utils.calcNumbreOfVisRows(this.elementHeight),
+                            this.dimensionList.itemsPagingHeight,
                         res.qListObject.qDimensionInfo.qCardinal,
                         "qlik"
                     );
 
                     let that = this;
                     genericObject.on("changed", function () {
-                        that.valueList.obj.emit("changed", utils.calcNumbreOfVisRows(that.elementHeight));
+                        that.valueList.obj.emit("changed", that.dimensionList.itemsPagingHeight);
                         genericObject.getLayout().then((res: EngineAPI.IGenericObjectProperties) => {
                             that.checkAvailabilityOfMenuListElementsValue(res.qListObject.qDimensionInfo);
                             that.checkIfDimIsLocked(res.qListObject.qDimensionInfo);
@@ -784,8 +773,8 @@ class SelectionsController implements ng.IController {
         }
 
         // absolutPosition out of sight above
-        if (focusedPosition > object.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
-            return newVal - utils.calcNumbreOfVisRows(this.elementHeight) + 1;
+        if (focusedPosition > object.itemsPagingTop + this.dimensionList.itemsPagingHeight) {
+            return newVal - this.dimensionList.itemsPagingHeight + 1;
         }
 
         // absolutPosition steps out of page below
@@ -794,7 +783,7 @@ class SelectionsController implements ng.IController {
         }
 
         // absolutPosition steps out of page above
-        if (newVal >= object.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
+        if (newVal >= object.itemsPagingTop + this.dimensionList.itemsPagingHeight) {
             return object.itemsPagingTop + 1;
         }
 
@@ -831,9 +820,9 @@ class SelectionsController implements ng.IController {
                     if (this.focusedPositionDimension < this.dimensionList.itemsPagingTop) {
                         this.dimensionList.itemsPagingTop = this.focusedPositionDimension;
                     } else if (this.focusedPositionDimension >
-                        this.dimensionList.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
+                        this.dimensionList.itemsPagingTop + this.dimensionList.itemsPagingHeight) {
                         this.dimensionList.itemsPagingTop
-                            = this.focusedPositionDimension - (utils.calcNumbreOfVisRows(this.elementHeight) + 1);
+                            = this.focusedPositionDimension - (this.dimensionList.itemsPagingHeight + 1);
 
                     }
 
@@ -879,7 +868,7 @@ class SelectionsController implements ng.IController {
                 if (this.valueList.collection) {
                     if (this.focusedPositionValues < 0 ||
                         this.focusedPositionValues >= this.valueList.collection.length ||
-                        this.focusedPositionValues >= utils.calcNumbreOfVisRows(this.elementHeight) + this.valueList.itemsPagingTop) {
+                        this.focusedPositionValues >= this.dimensionList.itemsPagingHeight + this.valueList.itemsPagingTop) {
                         this.focusedPositionValues = 0;
                         this.valueList.itemsPagingTop = 0;
                         domcontainer.element.children().children().children().children()[0].focus();
@@ -889,8 +878,8 @@ class SelectionsController implements ng.IController {
 
                     if (this.focusedPositionValues < this.valueList.itemsPagingTop) {
                         this.valueList.itemsPagingTop = this.focusedPositionValues;
-                    } else if (this.focusedPositionValues > this.valueList.itemsPagingTop + utils.calcNumbreOfVisRows(this.elementHeight)) {
-                        this.valueList.itemsPagingTop = this.focusedPositionValues - (utils.calcNumbreOfVisRows(this.elementHeight) + 1);
+                    } else if (this.focusedPositionValues > this.valueList.itemsPagingTop + this.dimensionList.itemsPagingHeight) {
+                        this.valueList.itemsPagingTop = this.focusedPositionValues - (this.dimensionList.itemsPagingHeight + 1);
                     }
                     domcontainer.element.children().children().children().children()[
                         this.focusedPositionValues - this.valueList.itemsPagingTop
@@ -948,6 +937,7 @@ class SelectionsController implements ng.IController {
                     return false;
                 }
         }
+
         return false;
     }
 
@@ -1019,6 +1009,79 @@ class SelectionsController implements ng.IController {
 
     private checkIfDimIsLocked(obj: EngineAPI.INxStateCounts) {
         this.lockMenuListValues = obj.qLocked > 0 || obj.qLockedExcluded > 0 ? true : false;
+    }
+
+    private buildDimensionList(object: EngineAPI.IGenericObject): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            object.getLayout()
+            .then((res: EngineAPI.IGenericHyperCubeLayout) => {
+                this.checkAvailabilityOfMenuListElementsDimension();
+                if (!this.dimensionList.obj || !this.dimensionList) {
+                    let dimObject = new utils.Q2gIndObject(new utils. AssistHyperCubeDimensionsInd(res));
+                    this.dimensionList = new utils.Q2gListAdapter(
+                        dimObject, this.dimensionList.itemsPagingHeight,
+                        res.qHyperCube.qDimensionInfo.length, "dimension");
+                } else {
+                    this.dimensionList.updateList(
+                        new utils.Q2gIndObject(
+                            new utils.AssistHyperCubeDimensionsInd(res)),
+                            this.dimensionList.itemsPagingHeight,
+                        res.qHyperCube.qDimensionInfo.length);
+                }
+                resolve(true);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+        });
+    }
+
+    private buildListProperties(): EngineAPI.IGenericObjectProperties {
+        let returnProperties: EngineAPI.IGenericObjectProperties = {
+            "qInfo": { "qType": "FieldList" },
+            "qFieldListDef": {
+                "qShowSystem": true,
+                "qShowHidden": true,
+                "qShowSemantic": true,
+                "qShowSrcTables": true,
+                "qShowDefinitionOnly": true,
+                "qShowDerivedFields": true,
+                "qShowImplicit": true
+            }
+        };
+        return returnProperties;
+    }
+
+    private buildFieldList(object: EngineAPI.IGenericObject): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+
+            object.app.createSessionObject(this.buildListProperties())
+                .then((sessionObject) => {
+                    return sessionObject.getLayout();
+                })
+                .then((res: any) => {
+                    this.checkAvailabilityOfMenuListElementsDimension();
+                    if (!this.dimensionList.obj || !this.dimensionList) {
+                        let dimObject = new utils.Q2gIndObject(new utils. AssistHyperCubeFields(res));
+                        this.dimensionList = new utils.Q2gListAdapter(
+                            dimObject, this.dimensionList.itemsPagingHeight,
+                            (res as any).qFieldList.qItems.length, "dimension");
+                    } else {
+                        this.dimensionList.updateList(
+                            new utils.Q2gIndObject(
+                                new utils.AssistHyperCubeFields(res)),
+                                this.dimensionList.itemsPagingHeight,
+                                (res as any).qFieldList.qItems.length);
+                    }
+
+
+
+                    resolve(true);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
     }
 }
 
