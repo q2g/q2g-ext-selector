@@ -8,7 +8,20 @@ keyboard control and full [JAWS](http://www.freedomscientific.com/Products/Blind
 
 ## Intro
 
-![teaser](https://github.com/q2g/q2g-ext-selector/raw/master/docs/teaser.gif "Short teaser")
+![teaser](./docs/teaser.gif "Short teaser")
+
+## Settings
+
+
+### Dimensions
+
+In the dimension section you can choose the fields and dimension you want to display in the extensin.
+
+### Options
+
+In the accessibillity options you can switch the use of shortcuts from the default values to customise shortcuts. The recommendation ist to use the combination of "strg + alt + {any keycode}", so that you do not get in truble with screenreaders shortcuts. Second you can switch the accessibillity option on, so that the screenreader gets triggered with any action made in this extension.
+
+![settings](./docs/screenshot_2.PNG?raw=true "Settings")
 
 ## Install
 

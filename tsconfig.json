@@ -1,14 +1,11 @@
 ﻿{
   "compileOnSave": true,
   "exclude": [
-    "packages",
-    "obj",
-    "bin",
-    "lib/davinci.js/src/node_modules",
-    "lib/davinci.js/src/packages"
+    ".vscode",
+    "node_modules"
   ],
   "compilerOptions": {
-    "module": "amd",
+    "module": "umd",
     "noEmitOnError": true,
     "noImplicitAny": false,
     "removeComments": false,
