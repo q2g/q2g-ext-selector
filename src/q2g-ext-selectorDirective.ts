@@ -1,4 +1,4 @@
-﻿//#region interfaces
+﻿//#region imports
 import { logging,
          utils,
          directives }           from "../node_modules/davinci.js/dist/umd/daVinci";
@@ -179,6 +179,7 @@ class SelectionsController implements ng.IController {
     }
     set model(value: EngineAPI.IGenericObject) {
         if (value !== this._model) {
+			console.log("value", value);
             try {
                 this._model = value;
                 let that = this;
