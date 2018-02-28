@@ -12,6 +12,7 @@ dist/
 ## Include
 !q2g-ext-selector.js
 !gulpfile.js
+!sense-go.js
 
 ## Standard vccode
 .vscode/*
