@@ -1,5 +1,4 @@
 # Selector Extension
-[![Greenkeeper badge](https://badges.greenkeeper.io/q2g/q2g-ext-selector.svg)](https://greenkeeper.io/)
 [![TravisCI](https://travis-ci.org/q2g/q2g-ext-selector.svg?branch=master)](https://travis-ci.org/q2g/q2g-ext-selector)
 [![Downloads](https://m.sense2go.net/downloads.svg?q2g-ext-selector)](https://m.sense2go.net/extension-package)
 
