@@ -13,7 +13,7 @@
     "@types/chai": "4.1.2",
     "@types/jquery": "3.3.1",
     "@types/mocha": "5.0.0",
-    "@types/qlik-engineapi": "12.67.0",
+    "@types/qlik-engineapi": "12.67.1",
     "@types/qlik-visualizationextensions": "4.0.2",
     "chai": "4.1.2",
     "gulp": "3.9.1",
