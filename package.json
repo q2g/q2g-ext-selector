@@ -11,7 +11,7 @@
   "devDependencies": {
     "@types/angular": "1.6.47",
     "@types/chai": "4.1.4",
-    "@types/jquery": "3.3.3",
+    "@types/jquery": "3.3.4",
     "@types/mocha": "5.2.2",
     "@types/qlik-engineapi": "12.67.1",
     "@types/qlik-visualizationextensions": "4.0.2",
