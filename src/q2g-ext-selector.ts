@@ -6,7 +6,7 @@ import * as template from "text!./q2g-ext-selectorExtension.html";
 import * as langDE from "text!./translate/de-DE/propertypanel.js";
 import * as langEN from "text!./translate/en-US/propertypanel.js";
 
-import { utils, logging, services, version } from "../node_modules/davinci.js/dist/umd/daVinci";
+import { utils, logging, services, version } from "./node_modules/davinci.js/dist/umd/daVinci";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";
 //#endregion
 
