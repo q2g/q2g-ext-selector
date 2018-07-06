@@ -19,7 +19,7 @@
         "gulp-clean": "0.4.0",
         "autoprefixer": "8.6.5",
         "clean-webpack-plugin": "0.1.19",
-        "copy-webpack-plugin": "4.5.1",
+        "copy-webpack-plugin": "4.5.2",
         "cross-env": "5.2.0",
         "css-loader": "1.0.0",
         "less": "3.5.3",
