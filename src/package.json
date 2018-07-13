@@ -14,7 +14,7 @@
         "@types/qlik-engineapi": "12.67.2",
         "@types/qlik-visualizationextensions": "4.0.2",
         "gulp": "3.9.1",
-        "gulp-less": "4.0.0",
+        "gulp-less": "4.0.1",
         "typescript": "2.9.2",
         "gulp-clean": "0.4.0",
         "autoprefixer": "8.6.5",
