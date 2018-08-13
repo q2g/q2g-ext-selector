@@ -37,7 +37,7 @@
         "webpack-deploy-after-build": "1.0.5"
     },
     "dependencies": {
-        "davinci.js": "1.4.4"
+        "davinci.js": "1.4.5"
     },
     "scripts": {
         "build": "tsc -p tsconfig.json && gulp less && gulp removePlaceholder",
