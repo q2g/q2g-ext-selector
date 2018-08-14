@@ -3,8 +3,8 @@ import "css!./q2g-ext-selectorExtension.css";
 import * as qvangular from "qvangular";
 import * as qlik from "qlik";
 import * as template from "text!./q2g-ext-selectorExtension.html";
-import * as langDE from "text!./translate/de-DE/propertypanel.js";
-import * as langEN from "text!./translate/en-US/propertypanel.js";
+import * as langDE from "./translate/de-DE/propertypanel";
+import * as langEN from "./translate/en-US/propertypanel";
 
 import { utils, logging, services, version } from "./node_modules/davinci.js/dist/umd/daVinci";
 import { SelectionsDirectiveFactory } from "./q2g-ext-selectorDirective";

@@ -18,5 +18,13 @@
         "es2015.iterable",
         "scripthost"
       ]
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "types": [
+      "chai",
+      "mocha",
+      "node"
+    ]
   }

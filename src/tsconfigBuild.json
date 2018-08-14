@@ -5,8 +5,6 @@
       "node_modules"
     ],
     "compilerOptions": {
-      "module": "commonJs",
-      "baseUrl" : ".",
       "noEmitOnError": true,
       "noImplicitAny": false,
       "removeComments": false,
