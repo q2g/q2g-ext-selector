@@ -1,7 +1,7 @@
 ﻿//#region imports
 import { logging,
          utils,
-         directives }           from "../node_modules/davinci.js/dist/umd/daVinci";
+         directives }           from "./node_modules/davinci.js/dist/umd/daVinci";
 import * as template            from "text!./q2g-ext-selectorDirective.html";
 //#endregion
 
@@ -15,6 +15,7 @@ export interface IShortcutProperties {
     shortcutFocusSearchField: string;
     shortcutFocusValueList: string;
     shortcutClearSelection: string;
+
 }
 //#endregion
 

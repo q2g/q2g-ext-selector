@@ -1,0 +1,34 @@
+{
+    "name": "q2g-ext-selector",
+    "version": "1.0.2",
+    "license": "MIT",
+    "description": "This extensions developed for blind users to make selections with full keyboard control and full JAWS support.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/q2g/q2g-ext-selector"
+    },
+    "author": "Thomas Häning, Konrad Mattheis (qlik2go) ",
+    "devDependencies": {
+        "@types/angular": "1.6.50",
+        "@types/jquery": "3.3.5",
+        "@types/qlik-engineapi": "12.67.4",
+        "@types/qlik-visualizationextensions": "4.0.2",
+        "q2g-build": "1.1.5",
+        "typescript": "3.0.1"
+    },
+    "dependencies": {
+        "davinci.js": "1.4.5"
+    },
+    "qext": {
+        "dependencies": {
+            "qlik-sense": ">=3.2.x"
+        },
+        "icon": "filterpane",
+        "name": "q2g Selector",
+        "preview": "preview.png",
+        "type": "visualization"
+    },
+    "scripts": {
+        "build": "node node_modules/q2g-build --builder extension --config q2g.extension.json"
+    }
+}
