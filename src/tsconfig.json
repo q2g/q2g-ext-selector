@@ -6,7 +6,7 @@
       "node_modules"
     ],
     "compilerOptions": {
-      "module": "commonJs",
+      "module": "umd",
       "noEmitOnError": true,
       "noImplicitAny": false,
       "removeComments": false,
@@ -18,7 +18,9 @@
         "es2015.promise",
         "es2015.iterable",
         "scripthost"
-      ],
-      "baseUrl": "."
-    }
+      ]
+    },
+    "include": [
+      "./**/*.ts"
+    ]
   }

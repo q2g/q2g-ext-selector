@@ -15,6 +15,7 @@ export interface IShortcutProperties {
     shortcutFocusSearchField: string;
     shortcutFocusValueList: string;
     shortcutClearSelection: string;
+
 }
 //#endregion
 
